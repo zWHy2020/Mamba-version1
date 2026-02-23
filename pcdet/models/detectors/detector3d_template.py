@@ -2,6 +2,7 @@ import os
 
 import torch
 import torch.nn as nn
+from torch.nn.parameter import is_lazy
 import numpy as np
 from ...ops.iou3d_nms import iou3d_nms_utils
 from ...utils.spconv_utils import find_all_spconv_keys
@@ -380,7 +381,9 @@ class Detector3DTemplate(nn.Module):
 
         for key in state_dict:
             if key not in update_model_state:
-                logger.info('Not updated weight %s: %s' % (key, str(state_dict[key].shape)))
+                param = state_dict[key]
+                shape = 'uninitialized (lazy parameter or buffer)' if is_lazy(param) else str(param.shape)
+                logger.info('Not updated weight %s: %s' % (key, shape))
 
         logger.info('==> Done (loaded %d/%d)' % (len(update_model_state), len(state_dict)))
 
