@@ -1,0 +1,13 @@
+
+# === Git自身 ===
+.git/
+
+build/
+ckpt/
+ckpts/
+data/
+output/
+tools/ckpts
+tools/hilbert_curves
+__pycache__
+
