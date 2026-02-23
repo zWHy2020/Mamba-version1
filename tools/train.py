@@ -8,11 +8,12 @@ from test import repeat_eval_ckpt
 
 import torch
 import torch.nn as nn
+from torch.nn.parameter import is_lazy
 from tensorboardX import SummaryWriter
 
 from pcdet.config import cfg, cfg_from_list, cfg_from_yaml_file, log_config_to_file
 from pcdet.datasets import build_dataloader
-from pcdet.models import build_network, model_fn_decorator
+from pcdet.models import build_network, model_fn_decorator, load_data_to_gpu
 from pcdet.utils import common_utils
 from train_utils.optimization import build_optimizer, build_scheduler
 from train_utils.train_utils import train_model
@@ -176,10 +177,32 @@ def main():
                     )
                     last_epoch = start_epoch + 1
                     break
-                except:
+                except Exception as e:
+                    logger.warning('Failed to load checkpoint %s, trying older one. Error: %s', ckpt_list[-1], repr(e))
                     ckpt_list = ckpt_list[:-1]
 
+            if len(ckpt_list) == 0:
+                logger.warning('No compatible checkpoint found in %s; training starts from random initialization.', ckpt_dir)
+
     model.train()  # before wrap to DistributedDataParallel to support fixed some parameters
+
+    lazy_param_names = [name for name, param in model.named_parameters() if is_lazy(param)]
+    if len(lazy_param_names) > 0:
+        logger.info(
+            'Found %d uninitialized lazy parameter(s) before DDP, running one warmup forward to initialize them.',
+            len(lazy_param_names)
+        )
+        warmup_batch = next(iter(train_loader))
+        load_data_to_gpu(warmup_batch)
+        with torch.no_grad():
+            model(warmup_batch)
+        lazy_param_names = [name for name, param in model.named_parameters() if is_lazy(param)]
+        if len(lazy_param_names) > 0:
+            raise RuntimeError(
+                'Lazy parameters remain uninitialized after warmup forward: '
+                f'{lazy_param_names[:20]}'
+            )
+
     if dist_train:
         model = nn.parallel.DistributedDataParallel(model, device_ids=[cfg.LOCAL_RANK % torch.cuda.device_count()]) # , find_unused_parameters=True
     logger.info(f'----------- Model {cfg.MODEL.NAME} created, param count: {sum([m.numel() for m in model.parameters()])} -----------')

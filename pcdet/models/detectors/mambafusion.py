@@ -87,6 +87,7 @@ class MambaFusion(Detector3DTemplate):
         spconv_keys = find_all_spconv_keys(self)
 
         update_model_state = {}
+        missing_keys = []
         for key, val in model_state_disk.items():
             if key in spconv_keys and key in state_dict and state_dict[key].shape != val.shape:
                 # with different spconv versions, we need to adapt weight shapes for spconv blocks
@@ -110,8 +111,14 @@ class MambaFusion(Detector3DTemplate):
             if key in state_dict and state_dict[key].shape == val.shape:
                 update_model_state[key] = val
             else:
-                print("not exist",key)
+                missing_keys.append(key)
                 # logger.info('Update weight %s: %s' % (key, str(val.shape)))
+
+        if missing_keys:
+            preview_count = min(20, len(missing_keys))
+            print(f"[MambaFusion] checkpoint has {len(missing_keys)} unmatched keys; showing first {preview_count}:")
+            for key in missing_keys[:preview_count]:
+                print("not exist", key)
 
         if strict:
             self.load_state_dict(update_model_state)
