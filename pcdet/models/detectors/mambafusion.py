@@ -5,6 +5,7 @@ from ..backbones_2d import fuser
 from ...utils.spconv_utils import find_all_spconv_keys
 from ..vmamba import build_vssm_model
 import torch.profiler
+from torch.nn.parameter import is_lazy
 class MambaFusion(Detector3DTemplate):
     def __init__(self, model_cfg, num_class, dataset):
         super().__init__(model_cfg=model_cfg, num_class=num_class, dataset=dataset)
@@ -108,8 +109,12 @@ class MambaFusion(Detector3DTemplate):
                     key = key.replace("input_layer","image_input_layer")
 
 
-            if key in state_dict and state_dict[key].shape == val.shape:
-                update_model_state[key] = val
+            if key in state_dict:
+                dst_param = state_dict[key]
+                if is_lazy(dst_param) or dst_param.shape == val.shape:
+                    update_model_state[key] = val
+                else:
+                    missing_keys.append(key)
             else:
                 missing_keys.append(key)
                 # logger.info('Update weight %s: %s' % (key, str(val.shape)))
