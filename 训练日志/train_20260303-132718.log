@@ -1,0 +1,1503 @@
+2026-03-03 13:27:18,940   INFO  **********************Start logging**********************
+2026-03-03 13:27:18,940   INFO  CUDA_VISIBLE_DEVICES=ALL
+2026-03-03 13:27:18,940   INFO  Training in distributed mode : total_batch_size: 12
+2026-03-03 13:27:18,940   INFO  cfg_file         cfgs/mambafusion_models/mamba_fusion.yaml
+2026-03-03 13:27:18,940   INFO  batch_size       3
+2026-03-03 13:27:18,940   INFO  epochs           10
+2026-03-03 13:27:18,940   INFO  workers          4
+2026-03-03 13:27:18,940   INFO  extra_tag        default
+2026-03-03 13:27:18,940   INFO  ckpt             /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model.pth
+2026-03-03 13:27:18,940   INFO  pretrained_model None
+2026-03-03 13:27:18,940   INFO  launcher         pytorch
+2026-03-03 13:27:18,940   INFO  tcp_port         18888
+2026-03-03 13:27:18,940   INFO  sync_bn          True
+2026-03-03 13:27:18,940   INFO  fix_random_seed  False
+2026-03-03 13:27:18,940   INFO  ckpt_save_interval 1
+2026-03-03 13:27:18,940   INFO  local_rank       0
+2026-03-03 13:27:18,940   INFO  max_ckpt_save_num 30
+2026-03-03 13:27:18,940   INFO  merge_all_iters_to_one_epoch False
+2026-03-03 13:27:18,940   INFO  set_cfgs         None
+2026-03-03 13:27:18,940   INFO  max_waiting_mins 0
+2026-03-03 13:27:18,940   INFO  start_epoch      0
+2026-03-03 13:27:18,940   INFO  num_epochs_to_eval 1
+2026-03-03 13:27:18,940   INFO  save_to_file     False
+2026-03-03 13:27:18,940   INFO  use_tqdm_to_record False
+2026-03-03 13:27:18,940   INFO  logger_iter_interval 1000
+2026-03-03 13:27:18,941   INFO  ckpt_save_time_interval 300
+2026-03-03 13:27:18,941   INFO  wo_gpu_stat      False
+2026-03-03 13:27:18,941   INFO  use_amp          False
+2026-03-03 13:27:18,941   INFO  eval_map         False
+2026-03-03 13:27:18,941   INFO  cfg.ROOT_DIR: /root/autodl-tmp/MambaFusion-main
+2026-03-03 13:27:18,941   INFO  cfg.LOCAL_RANK: 0
+2026-03-03 13:27:18,941   INFO  cfg.CLASS_NAMES: ['car', 'truck', 'construction_vehicle', 'bus', 'trailer', 'barrier', 'motorcycle', 'bicycle', 'pedestrian', 'traffic_cone']
+2026-03-03 13:27:18,941   INFO  cfg.return_abs_coords: True
+2026-03-03 13:27:18,941   INFO  cfg.use_test_interval: 1
+2026-03-03 13:27:18,941   INFO  ----------- DATA_CONFIG -----------
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.DATASET: NuScenesDataset
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.DATA_PATH: ../data/nuscenes
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.VERSION: v1.0-trainval
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.MAX_SWEEPS: 10
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.PRED_VELOCITY: True
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.SET_NAN_VELOCITY_TO_ZEROS: True
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.FILTER_MIN_POINTS_IN_GT: 1
+2026-03-03 13:27:18,941   INFO  ----------- DATA_SPLIT -----------
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.DATA_SPLIT.train: train
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.DATA_SPLIT.test: val
+2026-03-03 13:27:18,941   INFO  ----------- INFO_PATH -----------
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.INFO_PATH.train: ['nuscenes_infos_10sweeps_train_withimg.pkl']
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.INFO_PATH.test: ['nuscenes_infos_10sweeps_val_withimg.pkl']
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.POINT_CLOUD_RANGE: [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.BALANCED_RESAMPLING: True
+2026-03-03 13:27:18,941   INFO  ----------- DATA_AUGMENTOR -----------
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.DATA_AUGMENTOR.DISABLE_AUG_LIST: ['placeholder']
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.DATA_AUGMENTOR.AUG_CONFIG_LIST: [{'NAME': 'gt_sampling', 'IMG_AUG_TYPE': 'nuscenes', 'IMG_AUG_MIXUP': 0.7, 'DB_INFO_PATH': ['nuscenes_dbinfos_10sweeps_withvelo.pkl'], 'PREPARE': {'filter_by_min_points': ['car:5', 'truck:5', 'construction_vehicle:5', 'bus:5', 'trailer:5', 'barrier:5', 'motorcycle:5', 'bicycle:5', 'pedestrian:5', 'traffic_cone:5']}, 'USE_DEL': False, 'USE_SHARED_MEMORY': False, 'DB_DATA_PATH': ['nuscenes_10sweeps_withvelo_lidar.npy', 'nuscenes_10sweeps_withvelo_img.npy'], 'SAMPLE_GROUPS': ['car:2', 'truck:3', 'construction_vehicle:7', 'bus:4', 'trailer:6', 'barrier:2', 'motorcycle:6', 'bicycle:6', 'pedestrian:2', 'traffic_cone:2'], 'NUM_POINT_FEATURES': 5, 'DATABASE_WITH_FAKELIDAR': False, 'REMOVE_EXTRA_WIDTH': [0.0, 0.0, 0.0], 'LIMIT_WHOLE_SCENE': True, 'use_hf': False, 'fr_path': '/private_dataset/nuscenes_pcdet/v1.0-trainval/gt_database_10sweeps_withvelo', 'fr_num': 54899}, {'NAME': 'velocity_aug'}, {'NAME': 'random_world_flip', 'ALONG_AXIS_LIST': ['x', 'y']}, {'NAME': 'random_world_rotation', 'WORLD_ROT_ANGLE': [-0.78539816, 0.78539816]}, {'NAME': 'random_world_scaling', 'WORLD_SCALE_RANGE': [0.9, 1.1]}, {'NAME': 'random_world_translation', 'NOISE_TRANSLATE_STD': [0.5, 0.5, 0.5]}, {'NAME': 'imgaug', 'ROT_LIM': [-5.4, 5.4], 'RAND_FLIP': True}]
+2026-03-03 13:27:18,941   INFO  ----------- POINT_FEATURE_ENCODING -----------
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.POINT_FEATURE_ENCODING.encoding_type: absolute_coordinates_encoding
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.POINT_FEATURE_ENCODING.used_feature_list: ['x', 'y', 'z', 'intensity', 'timestamp']
+2026-03-03 13:27:18,941   INFO  cfg.DATA_CONFIG.POINT_FEATURE_ENCODING.src_feature_list: ['x', 'y', 'z', 'intensity', 'timestamp']
+2026-03-03 13:27:18,942   INFO  cfg.DATA_CONFIG.DATA_PROCESSOR: [{'NAME': 'mask_points_and_boxes_outside_range', 'REMOVE_OUTSIDE_BOXES': True}, {'NAME': 'shuffle_points', 'SHUFFLE_ENABLED': {'train': True, 'test': True}}, {'NAME': 'transform_points_to_voxels_placeholder', 'VOXEL_SIZE': [0.3, 0.3, 0.25]}, {'NAME': 'image_calibrate'}, {'NAME': 'image_normalize', 'use_debug_img': True, 'mean': [0.485, 0.456, 0.406], 'std': [0.229, 0.224, 0.225]}]
+2026-03-03 13:27:18,942   INFO  cfg.DATA_CONFIG._BASE_CONFIG_: cfgs/dataset_configs/nuscenes_dataset.yaml
+2026-03-03 13:27:18,942   INFO  ----------- SAMPLED_INTERVAL -----------
+2026-03-03 13:27:18,942   INFO  cfg.DATA_CONFIG.SAMPLED_INTERVAL.train: 1
+2026-03-03 13:27:18,942   INFO  cfg.DATA_CONFIG.SAMPLED_INTERVAL.test: 1
+2026-03-03 13:27:18,942   INFO  ----------- CAMERA_CONFIG -----------
+2026-03-03 13:27:18,942   INFO  cfg.DATA_CONFIG.CAMERA_CONFIG.USE_CAMERA: True
+2026-03-03 13:27:18,942   INFO  ----------- IMAGE -----------
+2026-03-03 13:27:18,942   INFO  cfg.DATA_CONFIG.CAMERA_CONFIG.IMAGE.FINAL_DIM: [256, 704]
+2026-03-03 13:27:18,942   INFO  cfg.DATA_CONFIG.CAMERA_CONFIG.IMAGE.RESIZE_LIM_TRAIN: [0.38, 0.55]
+2026-03-03 13:27:18,942   INFO  cfg.DATA_CONFIG.CAMERA_CONFIG.IMAGE.RESIZE_LIM_TEST: [0.48, 0.48]
+2026-03-03 13:27:18,942   INFO  ----------- MODEL -----------
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.NAME: MambaFusion
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.USE_VOXEL_MAMBA: True
+2026-03-03 13:27:18,942   INFO  ----------- VFE -----------
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.VFE.NAME: DynamicVoxelVFE
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.VFE.RETURN_ABS_COORDS: True
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.VFE.WITH_DISTANCE: False
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.VFE.USE_ABSLOTE_XYZ: True
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.VFE.USE_NORM: True
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.VFE.NUM_FILTERS: [128, 128]
+2026-03-03 13:27:18,942   INFO  ----------- BACKBONE_3D -----------
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.BACKBONE_3D.NAME: LION3DBackboneOneStride
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.BACKBONE_3D.USE_DOW5: True
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.BACKBONE_3D.RETURN_ABS_COORDS: True
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.BACKBONE_3D.FEATURE_DIM: 128
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.BACKBONE_3D.LAYER_DIM: [128, 128, 128, 128]
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.BACKBONE_3D.NUM_LAYERS: 4
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.BACKBONE_3D.DEPTHS: [2, 2, 2, 2]
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.BACKBONE_3D.LAYER_DOWN_SCALES: [[[2, 2, 2], [2, 2, 2]], [[2, 2, 2], [2, 2, 2]], [[2, 2, 2], [2, 2, 2]], [[2, 2, 2], [2, 2, 2]]]
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.BACKBONE_3D.WINDOW_SHAPE: [[13, 13, 32], [13, 13, 16], [13, 13, 8], [13, 13, 4]]
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.BACKBONE_3D.GROUP_SIZE: [4096, 2048, 1024, 512]
+2026-03-03 13:27:18,942   INFO  cfg.MODEL.BACKBONE_3D.DIRECTION: ['x', 'y']
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.BACKBONE_3D.DIFF_SCALE: 0.2
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.BACKBONE_3D.DIFFUSION: True
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.BACKBONE_3D.SHIFT: True
+2026-03-03 13:27:18,943   INFO  ----------- OPERATOR -----------
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.BACKBONE_3D.OPERATOR.NAME: Mamba
+2026-03-03 13:27:18,943   INFO  ----------- CFG -----------
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.BACKBONE_3D.OPERATOR.CFG.d_state: 16
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.BACKBONE_3D.OPERATOR.CFG.d_conv: 4
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.BACKBONE_3D.OPERATOR.CFG.expand: 2
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.BACKBONE_3D.OPERATOR.CFG.drop_path: 0.2
+2026-03-03 13:27:18,943   INFO  ----------- MM_BACKBONE -----------
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.NAME: MambaFusion
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.VIS_TAG: False
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.use_test_interval: 1
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.RETURN_ABS_COORDS: True
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.USE_WINMAMBA: True
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.USE_ALL_MAMBA: True
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.USE_MAMBA_INTER2: True
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.USE_VMAMBA_PRETRAIN: True
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.EMBED_TYPE: fixed
+2026-03-03 13:27:18,943   INFO  ----------- PATCH_EMBED -----------
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.PATCH_EMBED.in_channels: 3
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.PATCH_EMBED.image_size: [256, 704]
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.PATCH_EMBED.embed_dims: 128
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.PATCH_EMBED.patch_size: 8
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.PATCH_EMBED.patch_norm: True
+2026-03-03 13:27:18,943   INFO  ----------- norm_cfg -----------
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.PATCH_EMBED.norm_cfg.type: LN
+2026-03-03 13:27:18,943   INFO  ----------- IMAGE_INPUT_LAYER -----------
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.IMAGE_INPUT_LAYER.sparse_shape: [32, 88, 1]
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.IMAGE_INPUT_LAYER.d_model: [128]
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.IMAGE_INPUT_LAYER.set_info: [[90, 2]]
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.IMAGE_INPUT_LAYER.window_shape: [[30, 30, 1]]
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.IMAGE_INPUT_LAYER.hybrid_factor: [1, 1, 1]
+2026-03-03 13:27:18,943   INFO  cfg.MODEL.MM_BACKBONE.IMAGE_INPUT_LAYER.shifts_list: [[[0, 0, 0], [15, 15, 0]]]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.IMAGE_INPUT_LAYER.input_image: True
+2026-03-03 13:27:18,944   INFO  ----------- LIDAR_INPUT_LAYER -----------
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.LIDAR_INPUT_LAYER.sparse_shape: [360, 360, 1]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.LIDAR_INPUT_LAYER.d_model: [128]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.LIDAR_INPUT_LAYER.set_info: [[90, 2]]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.LIDAR_INPUT_LAYER.window_shape: [[30, 30, 1]]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.LIDAR_INPUT_LAYER.hybrid_factor: [1, 1, 1]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.LIDAR_INPUT_LAYER.shifts_list: [[[0, 0, 0], [15, 15, 0]]]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.set_info: [[90, 2]]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.d_model: [128]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.nhead: [8]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.dim_feedforward: [256]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.dropout: 0.0
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.activation: gelu
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.checkpoint_blocks: [0, 1]
+2026-03-03 13:27:18,944   INFO  ----------- layer_cfg -----------
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.layer_cfg.use_bn: False
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.layer_cfg.split_ffn: True
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.layer_cfg.split_residual: True
+2026-03-03 13:27:18,944   INFO  ----------- FUSE_BACKBONE -----------
+2026-03-03 13:27:18,944   INFO  ----------- LIDAR2IMAGE -----------
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.block_start: 1
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.block_end: 2
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.point_cloud_range: [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.voxel_size: [0.3, 0.3, 8.0]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.sample_num: 1
+2026-03-03 13:27:18,944   INFO  ----------- lidar2image_layer -----------
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.lidar2image_layer.sparse_shape: [96, 264, 6]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.lidar2image_layer.d_model: [128]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.lidar2image_layer.set_info: [[90, 1]]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.lidar2image_layer.window_shape: [[30, 30, 1]]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.lidar2image_layer.hybrid_factor: [1, 1, 1]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.lidar2image_layer.shifts_list: [[[0, 0, 0], [15, 15, 0]]]
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.FUSE_BACKBONE.LIDAR2IMAGE.lidar2image_layer.expand_max_voxels: 30
+2026-03-03 13:27:18,944   INFO  cfg.MODEL.MM_BACKBONE.out_indices: [0, 1]
+2026-03-03 13:27:18,945   INFO  ----------- NECK -----------
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.NECK.NAME: GeneralizedLSSFPN
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.NECK.IN_CHANNELS: [128, 128]
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.NECK.OUT_CHANNELS: 256
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.NECK.START_LEVEL: 0
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.NECK.END_LEVEL: -1
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.NECK.NUM_OUTS: 4
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.NECK.USE_BIAS: True
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.NECK.ALIGN_CORNERS: True
+2026-03-03 13:27:18,945   INFO  ----------- VTRANSFORM -----------
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.NAME: LSSTransform_Lite
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.USE_MAMBA: True
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.MAMBA_DOWNSAMPLE_SCALE: 2
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.IMAGE_SIZE: [256, 704]
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.IN_CHANNEL: 256
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.OUT_CHANNEL: 80
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.FEATURE_SIZE: [32, 88]
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.XBOUND: [-54.0, 54.0, 0.3]
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.YBOUND: [-54.0, 54.0, 0.3]
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.ZBOUND: [-10.0, 10.0, 20.0]
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.DBOUND: [1.0, 60.0, 0.5]
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.VTRANSFORM.DOWNSAMPLE: 1
+2026-03-03 13:27:18,945   INFO  ----------- FUSER -----------
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.NAME: ConvFuser
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.IN_CHANNEL: 208
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.OUT_CHANNEL: 128
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.USE_MODALITY_DROPOUT: False
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.P_CAM: 0.1
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.P_LIDAR: 0.05
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.USE_GATED_FUSION: True
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.USE_ALIGNMENT_PROXY: False
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.ALIGNMENT_PROXY_MODE: none
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.GATE_USE_MASK: True
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.GATE_HIDDEN_DIM: 128
+2026-03-03 13:27:18,945   INFO  cfg.MODEL.FUSER.GATE_PROJ_DIM: 64
+2026-03-03 13:27:18,945   INFO  ----------- MAP_TO_BEV -----------
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.MAP_TO_BEV.NAME: PointPillarScatter3d
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.MAP_TO_BEV.INPUT_SHAPE: [360, 360, 1]
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.MAP_TO_BEV.NUM_BEV_FEATURES: 128
+2026-03-03 13:27:18,946   INFO  ----------- BACKBONE_2D -----------
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.BACKBONE_2D.NAME: BaseBEVResBackbone
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.BACKBONE_2D.LAYER_NUMS: [1, 2, 2, 2]
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.BACKBONE_2D.LAYER_STRIDES: [1, 2, 2, 2]
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.BACKBONE_2D.NUM_FILTERS: [128, 128, 256, 256]
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.BACKBONE_2D.UPSAMPLE_STRIDES: [0.5, 1, 2, 4]
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.BACKBONE_2D.NUM_UPSAMPLE_FILTERS: [128, 128, 128, 128]
+2026-03-03 13:27:18,946   INFO  ----------- DENSE_HEAD -----------
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.CLASS_AGNOSTIC: False
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.NAME: TransFusionHead
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.QUERY_RADIUS: 20
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.QUERY_LOCAL: True
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.USE_BIAS_BEFORE_NORM: True
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.NUM_PROPOSALS: 200
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.HIDDEN_CHANNEL: 128
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.NUM_CLASSES: 10
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.NUM_HEADS: 8
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.NMS_KERNEL_SIZE: 3
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.FFN_CHANNEL: 256
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.DROPOUT: 0.1
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.BN_MOMENTUM: 0.1
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.ACTIVATION: relu
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.NUM_HM_CONV: 2
+2026-03-03 13:27:18,946   INFO  ----------- SEPARATE_HEAD_CFG -----------
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_ORDER: ['center', 'height', 'dim', 'rot', 'vel', 'iou']
+2026-03-03 13:27:18,946   INFO  ----------- HEAD_DICT -----------
+2026-03-03 13:27:18,946   INFO  ----------- center -----------
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.center.out_channels: 2
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.center.num_conv: 2
+2026-03-03 13:27:18,946   INFO  ----------- height -----------
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.height.out_channels: 1
+2026-03-03 13:27:18,946   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.height.num_conv: 2
+2026-03-03 13:27:18,947   INFO  ----------- dim -----------
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.dim.out_channels: 3
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.dim.num_conv: 2
+2026-03-03 13:27:18,947   INFO  ----------- rot -----------
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.rot.out_channels: 2
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.rot.num_conv: 2
+2026-03-03 13:27:18,947   INFO  ----------- vel -----------
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.vel.out_channels: 2
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.vel.num_conv: 2
+2026-03-03 13:27:18,947   INFO  ----------- iou -----------
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.iou.out_channels: 1
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.SEPARATE_HEAD_CFG.HEAD_DICT.iou.num_conv: 2
+2026-03-03 13:27:18,947   INFO  ----------- TARGET_ASSIGNER_CONFIG -----------
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.TARGET_ASSIGNER_CONFIG.FEATURE_MAP_STRIDE: 2
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.TARGET_ASSIGNER_CONFIG.DATASET: nuScenes
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.TARGET_ASSIGNER_CONFIG.GAUSSIAN_OVERLAP: 0.1
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.TARGET_ASSIGNER_CONFIG.MIN_RADIUS: 2
+2026-03-03 13:27:18,947   INFO  ----------- HUNGARIAN_ASSIGNER -----------
+2026-03-03 13:27:18,947   INFO  ----------- cls_cost -----------
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.TARGET_ASSIGNER_CONFIG.HUNGARIAN_ASSIGNER.cls_cost.gamma: 2.0
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.TARGET_ASSIGNER_CONFIG.HUNGARIAN_ASSIGNER.cls_cost.alpha: 0.25
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.TARGET_ASSIGNER_CONFIG.HUNGARIAN_ASSIGNER.cls_cost.weight: 0.15
+2026-03-03 13:27:18,947   INFO  ----------- reg_cost -----------
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.TARGET_ASSIGNER_CONFIG.HUNGARIAN_ASSIGNER.reg_cost.weight: 0.25
+2026-03-03 13:27:18,947   INFO  ----------- iou_cost -----------
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.TARGET_ASSIGNER_CONFIG.HUNGARIAN_ASSIGNER.iou_cost.weight: 0.25
+2026-03-03 13:27:18,947   INFO  ----------- LOSS_CONFIG -----------
+2026-03-03 13:27:18,947   INFO  ----------- LOSS_WEIGHTS -----------
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.LOSS_CONFIG.LOSS_WEIGHTS.cls_weight: 1.0
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.LOSS_CONFIG.LOSS_WEIGHTS.bbox_weight: 0.25
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.LOSS_CONFIG.LOSS_WEIGHTS.hm_weight: 1.0
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.LOSS_CONFIG.LOSS_WEIGHTS.iou_weight: 0.5
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.LOSS_CONFIG.LOSS_WEIGHTS.iou_reg_weight: 0.5
+2026-03-03 13:27:18,947   INFO  cfg.MODEL.DENSE_HEAD.LOSS_CONFIG.LOSS_WEIGHTS.code_weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.2, 0.2]
+2026-03-03 13:27:18,947   INFO  ----------- LOSS_CLS -----------
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.LOSS_CONFIG.LOSS_CLS.use_sigmoid: True
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.LOSS_CONFIG.LOSS_CLS.gamma: 2.0
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.LOSS_CONFIG.LOSS_CLS.alpha: 0.25
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.LOSS_CONFIG.LOSS_IOU: True
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.LOSS_CONFIG.LOSS_IOU_REG: True
+2026-03-03 13:27:18,948   INFO  ----------- POST_PROCESSING -----------
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.POST_PROCESSING.SCORE_THRESH: 0.0
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.POST_PROCESSING.POST_CENTER_RANGE: [-61.2, -61.2, -10.0, 61.2, 61.2, 10.0]
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.POST_PROCESSING.USE_IOU_TO_RECTIFY_SCORE: True
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.POST_PROCESSING.IOU_RECTIFIER: [0.5]
+2026-03-03 13:27:18,948   INFO  ----------- NMS_CONFIG -----------
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.NMS_CONFIG.NMS_TYPE: nms_gpu
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.NMS_CONFIG.NMS_THRESH: 0.2
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.NMS_CONFIG.NMS_PRE_MAXSIZE: 1000
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.NMS_CONFIG.NMS_POST_MAXSIZE: 100
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.DENSE_HEAD.NMS_CONFIG.SCORE_THRES: 0.0
+2026-03-03 13:27:18,948   INFO  ----------- POST_PROCESSING -----------
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.POST_PROCESSING.RECALL_THRESH_LIST: [0.3, 0.5, 0.7]
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.POST_PROCESSING.SCORE_THRESH: 0.1
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.POST_PROCESSING.OUTPUT_RAW_SCORE: False
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.POST_PROCESSING.EVAL_METRIC: kitti
+2026-03-03 13:27:18,948   INFO  ----------- NMS_CONFIG -----------
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.POST_PROCESSING.NMS_CONFIG.MULTI_CLASSES_NMS: True
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.POST_PROCESSING.NMS_CONFIG.NMS_TYPE: nms_gpu
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.POST_PROCESSING.NMS_CONFIG.NMS_THRESH: 0.2
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.POST_PROCESSING.NMS_CONFIG.NMS_PRE_MAXSIZE: 1000
+2026-03-03 13:27:18,948   INFO  cfg.MODEL.POST_PROCESSING.NMS_CONFIG.NMS_POST_MAXSIZE: 83
+2026-03-03 13:27:18,948   INFO  ----------- OPTIMIZATION -----------
+2026-03-03 13:27:18,948   INFO  cfg.OPTIMIZATION.BATCH_SIZE_PER_GPU: 3
+2026-03-03 13:27:18,948   INFO  cfg.OPTIMIZATION.NUM_EPOCHS: 10
+2026-03-03 13:27:18,948   INFO  cfg.OPTIMIZATION.ACCUMULATION_STEPS: 2
+2026-03-03 13:27:18,948   INFO  cfg.OPTIMIZATION.OPTIMIZER: adam_onecycle_split
+2026-03-03 13:27:18,948   INFO  cfg.OPTIMIZATION.LR: 0.0015
+2026-03-03 13:27:18,948   INFO  cfg.OPTIMIZATION.WEIGHT_DECAY: 0.03
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.MOMENTUM: 0.9
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.MOMS: [0.95, 0.85]
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.PCT_START: 0.4
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.DIV_FACTOR: 10
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.DECAY_STEP_LIST: [35, 45]
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.LR_DECAY: 0.1
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.LR_CLIP: 1e-07
+2026-03-03 13:27:18,949   INFO  ----------- SPLIT_CFG -----------
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.SPLIT_CFG.MODEL_NAME: ['MambaFusion.Backbone_VSSM']
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.SPLIT_CFG.SCALE: [0.1, 1]
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.LR_WARMUP: False
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.WARMUP_EPOCH: 1
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.GRAD_NORM_CLIP: 10
+2026-03-03 13:27:18,949   INFO  cfg.OPTIMIZATION.LOSS_SCALE_FP16: 32
+2026-03-03 13:27:18,949   INFO  ----------- HOOK -----------
+2026-03-03 13:27:18,949   INFO  ----------- DisableAugmentationHook -----------
+2026-03-03 13:27:18,949   INFO  cfg.HOOK.DisableAugmentationHook.DISABLE_AUG_LIST: ['gt_sampling']
+2026-03-03 13:27:18,949   INFO  cfg.HOOK.DisableAugmentationHook.NUM_LAST_EPOCHS: 2
+2026-03-03 13:27:18,949   INFO  cfg.TAG: mamba_fusion
+2026-03-03 13:27:18,949   INFO  cfg.EXP_GROUP_PATH: mambafusion_models
+2026-03-03 13:27:18,954   INFO  ----------- Create dataloader & network & optimizer -----------
+2026-03-03 13:27:24,283   INFO  Database filter by min points car: 339949 => 294532
+2026-03-03 13:27:24,293   INFO  Database filter by min points truck: 65262 => 60344
+2026-03-03 13:27:24,295   INFO  Database filter by min points construction_vehicle: 11050 => 10589
+2026-03-03 13:27:24,297   INFO  Database filter by min points bus: 12286 => 11619
+2026-03-03 13:27:24,299   INFO  Database filter by min points trailer: 19202 => 17934
+2026-03-03 13:27:24,311   INFO  Database filter by min points barrier: 107507 => 101993
+2026-03-03 13:27:24,313   INFO  Database filter by min points motorcycle: 8846 => 8055
+2026-03-03 13:27:24,314   INFO  Database filter by min points bicycle: 8185 => 7531
+2026-03-03 13:27:24,331   INFO  Database filter by min points pedestrian: 161928 => 148520
+2026-03-03 13:27:24,340   INFO  Database filter by min points traffic_cone: 62964 => 55504
+2026-03-03 13:27:24,435   INFO  Loading NuScenes dataset
+2026-03-03 13:27:28,385   INFO  Total samples for NuScenes dataset: 28130
+2026-03-03 13:27:28,664   INFO  Total samples after balanced resampling: 123580
+2026-03-03 13:27:36,285   INFO  ==> Loading parameters from checkpoint /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model.pth to CPU
+2026-03-03 13:27:36,694   INFO  ==> Loading optimizer parameters from checkpoint /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model.pth to CPU
+2026-03-03 13:27:36,787   INFO  ==> Done
+2026-03-03 13:27:37,214   INFO  ----------- Model MambaFusion created, param count: 33615377 -----------
+2026-03-03 13:27:37,214   INFO  DistributedDataParallel(
+  (module): MambaFusion(
+    (vfe): DynamicVoxelVFE(
+      (pfn_layers): ModuleList(
+        (0): PFNLayerV2(
+          (linear): Linear(in_features=11, out_features=64, bias=False)
+          (norm): SyncBatchNorm(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (relu): ReLU()
+        )
+        (1): PFNLayerV2(
+          (linear): Linear(in_features=128, out_features=128, bias=False)
+          (norm): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (relu): ReLU()
+        )
+      )
+    )
+    (backbone_3d): LION3DBackboneOneStride(
+      (linear_1): LIONBlock(
+        (encoder): ModuleList(
+          (0-1): 2 x LIONLayer(
+            (blocks): ModuleList(
+              (0-1): 2 x Block2(
+                (mamba): Mamba(
+                  (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                  (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                  (act): SiLU()
+                  (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                  (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                  (out_proj): Linear(in_features=256, out_features=128, bias=False)
+                )
+                (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                (drop_path): timm.DropPath(0.2)
+              )
+            )
+            (window_partition): FlattenedWindowMapping()
+          )
+        )
+        (downsample_list): ModuleList(
+          (0-1): 2 x PatchMerging3D(
+            (sub_conv): SparseSequential(
+              (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+              (1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+              (2): GELU(approximate='none')
+            )
+            (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+            (sigmoid): Sigmoid()
+          )
+        )
+        (pos_emb_list): ModuleList(
+          (0-1): 2 x PositionEmbeddingLearned(
+            (position_embedding_head): Sequential(
+              (0): Linear(in_features=3, out_features=128, bias=True)
+              (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): ReLU(inplace=True)
+              (3): Linear(in_features=128, out_features=128, bias=True)
+            )
+          )
+        )
+        (decoder): ModuleList(
+          (0-1): 2 x LIONLayer(
+            (blocks): ModuleList(
+              (0-1): 2 x Block2(
+                (mamba): Mamba(
+                  (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                  (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                  (act): SiLU()
+                  (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                  (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                  (out_proj): Linear(in_features=256, out_features=128, bias=False)
+                )
+                (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                (drop_path): timm.DropPath(0.2)
+              )
+            )
+            (window_partition): FlattenedWindowMapping()
+          )
+        )
+        (decoder_norm): ModuleList(
+          (0-1): 2 x LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        )
+        (upsample_list): ModuleList(
+          (0-1): 2 x PatchExpanding3D()
+        )
+      )
+      (dow1): PatchMerging3D(
+        (sub_conv): SparseSequential(
+          (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+          (1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (2): GELU(approximate='none')
+        )
+        (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        (sigmoid): Sigmoid()
+      )
+      (linear_2): LIONBlock(
+        (encoder): ModuleList(
+          (0-1): 2 x LIONLayer(
+            (blocks): ModuleList(
+              (0-1): 2 x Block2(
+                (mamba): Mamba(
+                  (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                  (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                  (act): SiLU()
+                  (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                  (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                  (out_proj): Linear(in_features=256, out_features=128, bias=False)
+                )
+                (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                (drop_path): timm.DropPath(0.2)
+              )
+            )
+            (window_partition): FlattenedWindowMapping()
+          )
+        )
+        (downsample_list): ModuleList(
+          (0-1): 2 x PatchMerging3D(
+            (sub_conv): SparseSequential(
+              (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+              (1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+              (2): GELU(approximate='none')
+            )
+            (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+            (sigmoid): Sigmoid()
+          )
+        )
+        (pos_emb_list): ModuleList(
+          (0-1): 2 x PositionEmbeddingLearned(
+            (position_embedding_head): Sequential(
+              (0): Linear(in_features=3, out_features=128, bias=True)
+              (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): ReLU(inplace=True)
+              (3): Linear(in_features=128, out_features=128, bias=True)
+            )
+          )
+        )
+        (decoder): ModuleList(
+          (0-1): 2 x LIONLayer(
+            (blocks): ModuleList(
+              (0-1): 2 x Block2(
+                (mamba): Mamba(
+                  (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                  (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                  (act): SiLU()
+                  (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                  (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                  (out_proj): Linear(in_features=256, out_features=128, bias=False)
+                )
+                (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                (drop_path): timm.DropPath(0.2)
+              )
+            )
+            (window_partition): FlattenedWindowMapping()
+          )
+        )
+        (decoder_norm): ModuleList(
+          (0-1): 2 x LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        )
+        (upsample_list): ModuleList(
+          (0-1): 2 x PatchExpanding3D()
+        )
+      )
+      (dow2): PatchMerging3D(
+        (sub_conv): SparseSequential(
+          (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+          (1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (2): GELU(approximate='none')
+        )
+        (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        (sigmoid): Sigmoid()
+      )
+      (linear_3): LIONBlock(
+        (encoder): ModuleList(
+          (0-1): 2 x LIONLayer(
+            (blocks): ModuleList(
+              (0-1): 2 x Block2(
+                (mamba): Mamba(
+                  (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                  (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                  (act): SiLU()
+                  (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                  (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                  (out_proj): Linear(in_features=256, out_features=128, bias=False)
+                )
+                (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                (drop_path): timm.DropPath(0.2)
+              )
+            )
+            (window_partition): FlattenedWindowMapping()
+          )
+        )
+        (downsample_list): ModuleList(
+          (0-1): 2 x PatchMerging3D(
+            (sub_conv): SparseSequential(
+              (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+              (1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+              (2): GELU(approximate='none')
+            )
+            (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+            (sigmoid): Sigmoid()
+          )
+        )
+        (pos_emb_list): ModuleList(
+          (0-1): 2 x PositionEmbeddingLearned(
+            (position_embedding_head): Sequential(
+              (0): Linear(in_features=3, out_features=128, bias=True)
+              (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): ReLU(inplace=True)
+              (3): Linear(in_features=128, out_features=128, bias=True)
+            )
+          )
+        )
+        (decoder): ModuleList(
+          (0-1): 2 x LIONLayer(
+            (blocks): ModuleList(
+              (0-1): 2 x Block2(
+                (mamba): Mamba(
+                  (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                  (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                  (act): SiLU()
+                  (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                  (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                  (out_proj): Linear(in_features=256, out_features=128, bias=False)
+                )
+                (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                (drop_path): timm.DropPath(0.2)
+              )
+            )
+            (window_partition): FlattenedWindowMapping()
+          )
+        )
+        (decoder_norm): ModuleList(
+          (0-1): 2 x LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        )
+        (upsample_list): ModuleList(
+          (0-1): 2 x PatchExpanding3D()
+        )
+      )
+      (dow3): PatchMerging3D(
+        (sub_conv): SparseSequential(
+          (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+          (1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (2): GELU(approximate='none')
+        )
+        (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        (sigmoid): Sigmoid()
+      )
+      (linear_4): LIONBlock(
+        (encoder): ModuleList(
+          (0-1): 2 x LIONLayer(
+            (blocks): ModuleList(
+              (0-1): 2 x Block2(
+                (mamba): Mamba(
+                  (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                  (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                  (act): SiLU()
+                  (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                  (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                  (out_proj): Linear(in_features=256, out_features=128, bias=False)
+                )
+                (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                (drop_path): timm.DropPath(0.2)
+              )
+            )
+            (window_partition): FlattenedWindowMapping()
+          )
+        )
+        (downsample_list): ModuleList(
+          (0-1): 2 x PatchMerging3D(
+            (sub_conv): SparseSequential(
+              (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+              (1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+              (2): GELU(approximate='none')
+            )
+            (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+            (sigmoid): Sigmoid()
+          )
+        )
+        (pos_emb_list): ModuleList(
+          (0-1): 2 x PositionEmbeddingLearned(
+            (position_embedding_head): Sequential(
+              (0): Linear(in_features=3, out_features=128, bias=True)
+              (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): ReLU(inplace=True)
+              (3): Linear(in_features=128, out_features=128, bias=True)
+            )
+          )
+        )
+        (decoder): ModuleList(
+          (0-1): 2 x LIONLayer(
+            (blocks): ModuleList(
+              (0-1): 2 x Block2(
+                (mamba): Mamba(
+                  (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                  (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                  (act): SiLU()
+                  (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                  (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                  (out_proj): Linear(in_features=256, out_features=128, bias=False)
+                )
+                (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                (drop_path): timm.DropPath(0.2)
+              )
+            )
+            (window_partition): FlattenedWindowMapping()
+          )
+        )
+        (decoder_norm): ModuleList(
+          (0-1): 2 x LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        )
+        (upsample_list): ModuleList(
+          (0-1): 2 x PatchExpanding3D()
+        )
+      )
+      (dow4): PatchMerging3D(
+        (sub_conv): SparseSequential(
+          (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+          (1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (2): GELU(approximate='none')
+        )
+        (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        (sigmoid): Sigmoid()
+      )
+      (linear_out): LIONLayer(
+        (blocks): ModuleList(
+          (0-1): 2 x Block2(
+            (mamba): Mamba(
+              (in_proj): Linear(in_features=128, out_features=512, bias=False)
+              (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+              (act): SiLU()
+              (x_proj): Linear(in_features=256, out_features=40, bias=False)
+              (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+              (out_proj): Linear(in_features=256, out_features=128, bias=False)
+            )
+            (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+            (drop_path): timm.DropPath(0.2)
+          )
+        )
+        (window_partition): FlattenedWindowMapping()
+      )
+      (dow5): PatchMerging3D(
+        (sub_conv): SparseSequential(
+          (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+          (1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (2): GELU(approximate='none')
+        )
+        (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        (sigmoid): Sigmoid()
+      )
+    )
+    (mm_backbone): MambaFusion(
+      (backbone_vssm): Backbone_VSSM(
+        (patch_embed): Sequential(
+          (0): Conv2d(3, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+          (1): Identity()
+          (2): LayerNorm2d((64,), eps=1e-05, elementwise_affine=True)
+          (3): Identity()
+          (4): GELU(approximate='none')
+          (5): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+          (6): Identity()
+          (7): LayerNorm2d((128,), eps=1e-05, elementwise_affine=True)
+        )
+        (layers): ModuleList(
+          (0): Sequential(
+            (blocks): Sequential(
+              (0): VSSBlock(
+                (norm): LayerNorm2d((128,), eps=1e-05, elementwise_affine=True)
+                (op): SS2D(
+                  (out_norm): LayerNorm2d((256,), eps=1e-05, elementwise_affine=True)
+                  (in_proj): Linear2d(in_features=128, out_features=256, bias=False)
+                  (act): SiLU()
+                  (conv2d): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=256, bias=False)
+                  (out_act): Identity()
+                  (out_proj): Linear2d(in_features=256, out_features=128, bias=False)
+                  (dropout): Identity()
+                )
+                (drop_path): timm.DropPath(0.0)
+                (norm2): LayerNorm2d((128,), eps=1e-05, elementwise_affine=True)
+                (mlp): Mlp(
+                  (fc1): Linear2d(in_features=128, out_features=512, bias=True)
+                  (act): GELU(approximate='none')
+                  (fc2): Linear2d(in_features=512, out_features=128, bias=True)
+                  (drop): Dropout(p=0.0, inplace=False)
+                )
+              )
+              (1): VSSBlock(
+                (norm): LayerNorm2d((128,), eps=1e-05, elementwise_affine=True)
+                (op): SS2D(
+                  (out_norm): LayerNorm2d((256,), eps=1e-05, elementwise_affine=True)
+                  (in_proj): Linear2d(in_features=128, out_features=256, bias=False)
+                  (act): SiLU()
+                  (conv2d): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=256, bias=False)
+                  (out_act): Identity()
+                  (out_proj): Linear2d(in_features=256, out_features=128, bias=False)
+                  (dropout): Identity()
+                )
+                (drop_path): timm.DropPath(0.06666667014360428)
+                (norm2): LayerNorm2d((128,), eps=1e-05, elementwise_affine=True)
+                (mlp): Mlp(
+                  (fc1): Linear2d(in_features=128, out_features=512, bias=True)
+                  (act): GELU(approximate='none')
+                  (fc2): Linear2d(in_features=512, out_features=128, bias=True)
+                  (drop): Dropout(p=0.0, inplace=False)
+                )
+              )
+            )
+            (downsample): Sequential(
+              (0): Identity()
+              (1): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+              (2): Identity()
+              (3): LayerNorm2d((256,), eps=1e-05, elementwise_affine=True)
+            )
+          )
+          (1): Sequential(
+            (blocks): Sequential(
+              (0): VSSBlock(
+                (norm): LayerNorm2d((256,), eps=1e-05, elementwise_affine=True)
+                (op): SS2D(
+                  (out_norm): LayerNorm2d((512,), eps=1e-05, elementwise_affine=True)
+                  (in_proj): Linear2d(in_features=256, out_features=512, bias=False)
+                  (act): SiLU()
+                  (conv2d): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=512, bias=False)
+                  (out_act): Identity()
+                  (out_proj): Linear2d(in_features=512, out_features=256, bias=False)
+                  (dropout): Identity()
+                )
+                (drop_path): timm.DropPath(0.13333332538604736)
+                (norm2): LayerNorm2d((256,), eps=1e-05, elementwise_affine=True)
+                (mlp): Mlp(
+                  (fc1): Linear2d(in_features=256, out_features=1024, bias=True)
+                  (act): GELU(approximate='none')
+                  (fc2): Linear2d(in_features=1024, out_features=256, bias=True)
+                  (drop): Dropout(p=0.0, inplace=False)
+                )
+              )
+              (1): VSSBlock(
+                (norm): LayerNorm2d((256,), eps=1e-05, elementwise_affine=True)
+                (op): SS2D(
+                  (out_norm): LayerNorm2d((512,), eps=1e-05, elementwise_affine=True)
+                  (in_proj): Linear2d(in_features=256, out_features=512, bias=False)
+                  (act): SiLU()
+                  (conv2d): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=512, bias=False)
+                  (out_act): Identity()
+                  (out_proj): Linear2d(in_features=512, out_features=256, bias=False)
+                  (dropout): Identity()
+                )
+                (drop_path): timm.DropPath(0.20000000298023224)
+                (norm2): LayerNorm2d((256,), eps=1e-05, elementwise_affine=True)
+                (mlp): Mlp(
+                  (fc1): Linear2d(in_features=256, out_features=1024, bias=True)
+                  (act): GELU(approximate='none')
+                  (fc2): Linear2d(in_features=1024, out_features=256, bias=True)
+                  (drop): Dropout(p=0.0, inplace=False)
+                )
+              )
+            )
+            (downsample): Identity()
+          )
+        )
+        (outnorm1): LayerNorm2d((256,), eps=1e-05, elementwise_affine=True)
+      )
+      (vssm_down_block): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (image_input_layer): UniTRInputLayer(
+        (posembed_layers): ModuleList(
+          (0): ModuleList(
+            (0-1): 2 x Identity()
+          )
+        )
+      )
+      (lidar_input_layer): UniTRInputLayer(
+        (posembed_layers): ModuleList(
+          (0): ModuleList(
+            (0-1): 2 x Identity()
+          )
+        )
+      )
+      (out_norm0): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+      (out_norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+      (map_lidar2image_layer): MapLidar2Image()
+      (pos_embed_inter2): ModuleList(
+        (0): Sequential(
+          (0): Linear(in_features=9, out_features=128, bias=True)
+          (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+          (3): Linear(in_features=128, out_features=128, bias=True)
+        )
+      )
+      (multi_scale_norm_list): ModuleList()
+      (pos_embed_intra): Sequential(
+        (0): Linear(in_features=9, out_features=128, bias=True)
+        (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): ReLU(inplace=True)
+        (3): Linear(in_features=128, out_features=128, bias=True)
+      )
+      (stage_0): ModuleList(
+        (0-1): 2 x ModuleList(
+          (0): LocalMamba(
+            (encoder): ModuleList(
+              (0-1): 2 x LocalMambaLayer(
+                (blocks): ModuleList(
+                  (0-1): 2 x Block2(
+                    (mamba): Mamba(
+                      (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                      (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                      (act): SiLU()
+                      (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                      (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                      (out_proj): Linear(in_features=256, out_features=128, bias=False)
+                    )
+                    (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                    (drop_path): timm.DropPath(0.2)
+                  )
+                )
+                (window_partition): FlattenedWindowMapping()
+              )
+            )
+            (downsample_list): ModuleList(
+              (0-1): 2 x PatchMerging3D(
+                (sub_conv): SparseSequential(
+                  (0): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+                  (1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                  (2): GELU(approximate='none')
+                )
+                (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                (sigmoid): Sigmoid()
+              )
+            )
+            (pos_emb_list): ModuleList(
+              (0-1): 2 x PositionEmbeddingLearned(
+                (position_embedding_head): Sequential(
+                  (0): Linear(in_features=2, out_features=128, bias=True)
+                  (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                  (2): ReLU(inplace=True)
+                  (3): Linear(in_features=128, out_features=128, bias=True)
+                )
+              )
+            )
+            (decoder): ModuleList(
+              (0-1): 2 x LocalMambaLayer(
+                (blocks): ModuleList(
+                  (0-1): 2 x Block2(
+                    (mamba): Mamba(
+                      (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                      (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                      (act): SiLU()
+                      (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                      (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                      (out_proj): Linear(in_features=256, out_features=128, bias=False)
+                    )
+                    (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+                    (drop_path): timm.DropPath(0.2)
+                  )
+                )
+                (window_partition): FlattenedWindowMapping()
+              )
+            )
+            (decoder_norm): ModuleList(
+              (0-1): 2 x LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+            )
+            (upsample_list): ModuleList(
+              (0-1): 2 x PatchExpanding3D()
+            )
+          )
+          (1): GlobalMamba(
+            (mamba_encoder_list): ModuleList(
+              (0-1): 2 x Block(
+                (norm): RMSNorm()
+                (mixer): Mamba(
+                  (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                  (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                  (act): SiLU()
+                  (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                  (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                  (out_proj): Linear(in_features=256, out_features=128, bias=False)
+                )
+              )
+            )
+            (conv_encoder): ModuleList(
+              (0): DownSp(
+                (blocks): SparseSequential(
+                  (0): Identity()
+                )
+              )
+              (1): DownSp(
+                (blocks): SparseSequential(
+                  (0): SparseSequential(
+                    (0): SparseConv3d(128, 128, kernel_size=[3, 3, 3], stride=[2, 2, 2], padding=[1, 1, 1], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+                    (1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+                    (2): ReLU()
+                  )
+                  (1): Sparse1ConvBlock(
+                    (conv1): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[1, 1, 1], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+                    (bn1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+                    (relu): ReLU()
+                  )
+                )
+              )
+            )
+            (conv_decoder): ModuleList(
+              (0): SparseSequential(
+                (0): SparseInverseConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+                (1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+                (2): ReLU()
+              )
+            )
+            (conv_decoder_norm): ModuleList(
+              (0): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            )
+            (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+            (norm_back): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          )
+        )
+      )
+      (residual_norm_stage_0): ModuleList(
+        (0-1): 2 x LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+      )
+      (lidar_residual_norm_stage_0): ModuleList(
+        (0-1): 2 x LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+      )
+    )
+    (neck): GeneralizedLSSFPN(
+      (lateral_convs): ModuleList(
+        (0): BasicBlock2D(
+          (conv): Conv2d(256, 256, kernel_size=(1, 1), stride=(1, 1))
+          (bn): SyncBatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+      )
+      (fpn_convs): ModuleList(
+        (0): BasicBlock2D(
+          (conv): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (bn): SyncBatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+      )
+    )
+    (vtransform): LSSTransform_Lite(
+      (mamba_layernorm): LayerNorm((80,), eps=1e-05, elementwise_affine=True)
+      (mamba_layernorm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+      (mamba_blocks): ModuleList(
+        (0): GlobalMamba(
+          (mamba_encoder_list): ModuleList(
+            (0-1): 2 x Block(
+              (norm): RMSNorm()
+              (mixer): Mamba(
+                (in_proj): Linear(in_features=128, out_features=512, bias=False)
+                (conv1d): Conv1d(256, 256, kernel_size=(4,), stride=(1,), padding=(3,), groups=256)
+                (act): SiLU()
+                (x_proj): Linear(in_features=256, out_features=40, bias=False)
+                (dt_proj): Linear(in_features=8, out_features=256, bias=True)
+                (out_proj): Linear(in_features=256, out_features=128, bias=False)
+              )
+            )
+          )
+          (conv_encoder): ModuleList(
+            (0): DownSp(
+              (blocks): SparseSequential(
+                (0): Identity()
+              )
+            )
+            (1): DownSp(
+              (blocks): SparseSequential(
+                (0): SparseSequential(
+                  (0): SparseConv3d(128, 128, kernel_size=[3, 3, 3], stride=[2, 2, 2], padding=[1, 1, 1], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+                  (1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+                  (2): ReLU()
+                )
+                (1): Sparse1ConvBlock(
+                  (conv1): SubMConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[1, 1, 1], dilation=[1, 1, 1], output_padding=[0, 0, 0], algo=ConvAlgo.MaskImplicitGemm)
+                  (bn1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+                  (relu): ReLU()
+                )
+              )
+            )
+          )
+          (conv_decoder): ModuleList(
+            (0): SparseSequential(
+              (0): SparseInverseConv3d(128, 128, kernel_size=[3, 3, 3], stride=[1, 1, 1], padding=[0, 0, 0], dilation=[1, 1, 1], output_padding=[0, 0, 0], bias=False, algo=ConvAlgo.MaskImplicitGemm)
+              (1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+              (2): ReLU()
+            )
+          )
+          (conv_decoder_norm): ModuleList(
+            (0): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          )
+          (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+          (norm_back): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        )
+      )
+      (sub_dim): Sequential(
+        (0): Conv2d(128, 80, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (1): SyncBatchNorm(80, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): ReLU()
+        (3): ConvTranspose2d(80, 80, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), output_padding=(1, 1), bias=False)
+        (4): SyncBatchNorm(80, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (5): ReLU()
+      )
+      (pos_embed_inter): Sequential(
+        (0): Linear(in_features=9, out_features=128, bias=True)
+        (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): ReLU(inplace=True)
+        (3): Linear(in_features=128, out_features=128, bias=True)
+      )
+      (mamba_downsample): Sequential(
+        (0): Conv2d(80, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): ReLU(inplace=True)
+        (3): Conv2d(128, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (4): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (5): ReLU(inplace=True)
+        (6): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (7): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (8): ReLU(inplace=True)
+      )
+      (depthnet): Conv2d(256, 198, kernel_size=(1, 1), stride=(1, 1))
+      (downsample): Identity()
+    )
+    (map_to_bev_module): PointPillarScatter3d()
+    (fuser): ConvFuser(
+      (conv): Sequential(
+        (0): Conv2d(208, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): ReLU(inplace=True)
+      )
+      (modality_dropout): ModalityDropout()
+      (sparse_spatial_gate): SparseMoESpatialGate(
+        (router): Sequential(
+          (0): LazyLinear(in_features=0, out_features=128, bias=True)
+          (1): SiLU(inplace=True)
+          (2): Linear(in_features=128, out_features=3, bias=True)
+        )
+      )
+    )
+    (backbone_2d): BaseBEVResBackbone(
+      (blocks): ModuleList(
+        (0): Sequential(
+          (0): BasicBlock(
+            (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu1): ReLU()
+            (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn2): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu2): ReLU()
+            (downsample_layer): Sequential(
+              (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            )
+          )
+          (1): BasicBlock(
+            (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu1): ReLU()
+            (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn2): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu2): ReLU()
+          )
+        )
+        (1): Sequential(
+          (0): BasicBlock(
+            (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+            (bn1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu1): ReLU()
+            (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn2): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu2): ReLU()
+            (downsample_layer): Sequential(
+              (0): Conv2d(128, 128, kernel_size=(1, 1), stride=(2, 2), bias=False)
+              (1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            )
+          )
+          (1): BasicBlock(
+            (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu1): ReLU()
+            (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn2): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu2): ReLU()
+          )
+          (2): BasicBlock(
+            (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu1): ReLU()
+            (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn2): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu2): ReLU()
+          )
+        )
+        (2): Sequential(
+          (0): BasicBlock(
+            (conv1): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+            (bn1): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu1): ReLU()
+            (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn2): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu2): ReLU()
+            (downsample_layer): Sequential(
+              (0): Conv2d(128, 256, kernel_size=(1, 1), stride=(2, 2), bias=False)
+              (1): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            )
+          )
+          (1): BasicBlock(
+            (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn1): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu1): ReLU()
+            (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn2): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu2): ReLU()
+          )
+          (2): BasicBlock(
+            (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn1): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu1): ReLU()
+            (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn2): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu2): ReLU()
+          )
+        )
+        (3): Sequential(
+          (0): BasicBlock(
+            (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+            (bn1): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu1): ReLU()
+            (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn2): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu2): ReLU()
+            (downsample_layer): Sequential(
+              (0): Conv2d(256, 256, kernel_size=(1, 1), stride=(2, 2), bias=False)
+              (1): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            )
+          )
+          (1): BasicBlock(
+            (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn1): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu1): ReLU()
+            (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn2): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu2): ReLU()
+          )
+          (2): BasicBlock(
+            (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn1): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu1): ReLU()
+            (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            (bn2): SyncBatchNorm(256, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+            (relu2): ReLU()
+          )
+        )
+      )
+      (deblocks): ModuleList(
+        (0): Sequential(
+          (0): Conv2d(128, 128, kernel_size=(2, 2), stride=(2, 2), bias=False)
+          (1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (1): Sequential(
+          (0): ConvTranspose2d(128, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (2): Sequential(
+          (0): ConvTranspose2d(256, 128, kernel_size=(2, 2), stride=(2, 2), bias=False)
+          (1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+        (3): Sequential(
+          (0): ConvTranspose2d(256, 128, kernel_size=(4, 4), stride=(4, 4), bias=False)
+          (1): SyncBatchNorm(128, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU()
+        )
+      )
+    )
+    (dense_head): TransFusionHead(
+      (loss_cls): SigmoidFocalClassificationLoss()
+      (loss_bbox): L1Loss()
+      (loss_heatmap): GaussianFocalLoss()
+      (shared_conv): Conv2d(512, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (heatmap_head): Sequential(
+        (0): BasicBlock2D(
+          (conv): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+          (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+        )
+        (1): Conv2d(128, 10, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (class_encoding): Conv1d(10, 128, kernel_size=(1,), stride=(1,))
+      (decoder): TransformerDecoderLayer(
+        (self_attn): MultiheadAttention(
+          (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+        )
+        (multihead_attn): MultiheadAttention(
+          (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+        )
+        (linear1): Linear(in_features=128, out_features=256, bias=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+        (linear2): Linear(in_features=256, out_features=128, bias=True)
+        (norm1): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        (norm2): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        (norm3): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+        (dropout1): Dropout(p=0.1, inplace=False)
+        (dropout2): Dropout(p=0.1, inplace=False)
+        (dropout3): Dropout(p=0.1, inplace=False)
+        (self_posembed): PositionEmbeddingLearned(
+          (position_embedding_head): Sequential(
+            (0): Conv1d(2, 128, kernel_size=(1,), stride=(1,))
+            (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+            (3): Conv1d(128, 128, kernel_size=(1,), stride=(1,))
+          )
+        )
+        (cross_posembed): PositionEmbeddingLearned(
+          (position_embedding_head): Sequential(
+            (0): Conv1d(2, 128, kernel_size=(1,), stride=(1,))
+            (1): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU(inplace=True)
+            (3): Conv1d(128, 128, kernel_size=(1,), stride=(1,))
+          )
+        )
+      )
+      (prediction_head): SeparateHead_Transfusion(
+        (center): Sequential(
+          (0): Sequential(
+            (0): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+            (1): SyncBatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Conv1d(64, 2, kernel_size=(1,), stride=(1,))
+        )
+        (height): Sequential(
+          (0): Sequential(
+            (0): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+            (1): SyncBatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Conv1d(64, 1, kernel_size=(1,), stride=(1,))
+        )
+        (dim): Sequential(
+          (0): Sequential(
+            (0): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+            (1): SyncBatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Conv1d(64, 3, kernel_size=(1,), stride=(1,))
+        )
+        (rot): Sequential(
+          (0): Sequential(
+            (0): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+            (1): SyncBatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Conv1d(64, 2, kernel_size=(1,), stride=(1,))
+        )
+        (vel): Sequential(
+          (0): Sequential(
+            (0): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+            (1): SyncBatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Conv1d(64, 2, kernel_size=(1,), stride=(1,))
+        )
+        (iou): Sequential(
+          (0): Sequential(
+            (0): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+            (1): SyncBatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Conv1d(64, 1, kernel_size=(1,), stride=(1,))
+        )
+        (heatmap): Sequential(
+          (0): Sequential(
+            (0): Conv1d(128, 64, kernel_size=(1,), stride=(1,))
+            (1): SyncBatchNorm(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU()
+          )
+          (1): Conv1d(64, 10, kernel_size=(1,), stride=(1,))
+        )
+      )
+    )
+  )
+)
+2026-03-03 13:27:37,231   INFO  **********************Start training mambafusion_models/mamba_fusion(default)**********************
+2026-03-03 13:28:44,518   INFO  Train:    6/10 ( 60%) [2253/10299 ( 22%)]  Loss: 2.096 (2.10)  loss_hm=0.6895, loss_cls=0.0917, loss_bbox=0.9735, matched_ious=0.4945, loss_iou=0.1117, loss_iou_reg=0.2298, d_time=5.30(5.30), f_time=61.01(61.01), b_time=66.31(66.31)  LR: 1.352e-03  Time cost: 01:06/148:21:01 [01:07/907:54:48]  Acc_iter 53749       Data time: 5.30(5.30)  Forward time: 61.01(61.01)  Batch time: 66.31(66.31)
+2026-03-03 13:32:39,758   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 13:37:02,018   INFO  Train:    6/10 ( 60%) [2504/10299 ( 24%)]  Loss: 2.494 (2.06)  loss_hm=0.6760, loss_cls=0.0893, loss_bbox=0.9723, matched_ious=0.5029, loss_iou=0.0947, loss_iou_reg=0.2278, d_time=0.00(0.03), f_time=1.90(2.21), b_time=1.91(2.24)  LR: 1.347e-03  Time cost: 09:23/4:50:42 [09:24/30:27:02]  Acc_iter 54000       Data time: 0.00(0.03)  Forward time: 1.90(2.21)  Batch time: 1.91(2.24)
+2026-03-03 13:37:02,221   INFO  
+2026-03-03 13:37:39,906   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 13:42:39,297   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 13:47:39,679   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 13:52:39,522   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 13:57:40,067   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:02:39,707   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:07:39,292   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:10:17,948   INFO  Train:    6/10 ( 60%) [3504/10299 ( 34%)]  Loss: 2.088 (2.09)  loss_hm=0.6859, loss_cls=0.0895, loss_bbox=1.0027, matched_ious=0.5016, loss_iou=0.0941, loss_iou_reg=0.2272, d_time=0.01(0.02), f_time=1.97(2.03), b_time=1.97(2.04)  LR: 1.323e-03  Time cost: 42:39/3:51:32 [42:40/27:15:21]  Acc_iter 55000       Data time: 0.01(0.02)  Forward time: 1.97(2.03)  Batch time: 1.97(2.04)
+2026-03-03 14:12:40,440   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:17:40,800   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:22:40,025   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:27:39,012   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:32:40,118   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:37:40,632   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:42:41,437   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:43:27,664   INFO  Train:    6/10 ( 60%) [4504/10299 ( 44%)]  Loss: 1.645 (2.07)  loss_hm=0.6701, loss_cls=0.0882, loss_bbox=0.9756, matched_ious=0.5061, loss_iou=0.0937, loss_iou_reg=0.2259, d_time=0.01(0.01), f_time=2.04(2.01), b_time=2.05(2.02)  LR: 1.297e-03  Time cost: 1:15:49/3:15:07 [1:15:50/26:22:11]  Acc_iter 56000       Data time: 0.01(0.01)  Forward time: 2.04(2.01)  Batch time: 2.05(2.02)
+2026-03-03 14:47:40,258   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:52:41,218   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 14:57:39,788   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:02:39,540   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:07:40,686   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:12:39,722   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:16:40,615   INFO  Train:    6/10 ( 60%) [5504/10299 ( 53%)]  Loss: 1.984 (2.05)  loss_hm=0.6463, loss_cls=0.0860, loss_bbox=0.9358, matched_ious=0.5110, loss_iou=0.0935, loss_iou_reg=0.2244, d_time=0.01(0.01), f_time=1.93(2.00), b_time=1.94(2.01)  LR: 1.271e-03  Time cost: 1:49:02/2:40:46 [1:49:03/25:42:06]  Acc_iter 57000       Data time: 0.01(0.01)  Forward time: 1.93(2.00)  Batch time: 1.94(2.01)
+2026-03-03 15:16:40,808   INFO  
+2026-03-03 15:17:40,720   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:22:40,144   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:27:39,747   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:32:39,749   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:37:39,915   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:42:42,513   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:47:39,767   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:49:53,852   INFO  Train:    6/10 ( 60%) [6504/10299 ( 63%)]  Loss: 1.726 (2.03)  loss_hm=0.6512, loss_cls=0.0867, loss_bbox=0.9386, matched_ious=0.5127, loss_iou=0.0937, loss_iou_reg=0.2240, d_time=0.00(0.01), f_time=1.81(1.99), b_time=1.82(2.01)  LR: 1.243e-03  Time cost: 2:22:15/2:06:58 [2:22:16/25:05:17]  Acc_iter 58000       Data time: 0.00(0.01)  Forward time: 1.81(1.99)  Batch time: 1.82(2.01)
+2026-03-03 15:52:39,237   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 15:57:39,703   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:02:40,596   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:07:39,752   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:12:40,467   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:17:41,126   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:22:39,885   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:23:17,204   INFO  Train:    6/10 ( 60%) [7504/10299 ( 73%)]  Loss: 1.928 (2.01)  loss_hm=0.6315, loss_cls=0.0848, loss_bbox=0.8970, matched_ious=0.5159, loss_iou=0.0934, loss_iou_reg=0.2235, d_time=0.00(0.01), f_time=1.84(1.99), b_time=1.84(2.01)  LR: 1.213e-03  Time cost: 2:55:39/1:33:28 [2:55:39/24:31:15]  Acc_iter 59000       Data time: 0.00(0.01)  Forward time: 1.84(1.99)  Batch time: 1.84(2.01)
+2026-03-03 16:27:39,861   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:32:39,677   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:37:39,702   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:42:40,308   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:47:40,516   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:52:39,818   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 16:56:36,850   INFO  Train:    6/10 ( 60%) [8504/10299 ( 83%)]  Loss: 2.087 (2.00)  loss_hm=0.6225, loss_cls=0.0835, loss_bbox=0.8902, matched_ious=0.5180, loss_iou=0.0932, loss_iou_reg=0.2227, d_time=0.00(0.01), f_time=1.88(1.99), b_time=1.88(2.01)  LR: 1.183e-03  Time cost: 3:28:58/59:59 [3:28:59/23:57:00]  Acc_iter 60000       Data time: 0.00(0.01)  Forward time: 1.88(1.99)  Batch time: 1.88(2.01)
+2026-03-03 16:56:37,067   INFO  
+2026-03-03 16:57:40,654   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:02:39,269   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:07:39,142   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:12:40,708   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:17:39,475   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:22:39,425   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:27:39,882   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:30:15,218   INFO  Train:    6/10 ( 60%) [9504/10299 ( 92%)]  Loss: 1.827 (1.98)  loss_hm=0.6126, loss_cls=0.0827, loss_bbox=0.8659, matched_ious=0.5208, loss_iou=0.0929, loss_iou_reg=0.2220, d_time=0.00(0.01), f_time=1.91(1.99), b_time=1.92(2.01)  LR: 1.151e-03  Time cost: 4:02:37/26:35 [4:02:37/23:24:49]  Acc_iter 61000       Data time: 0.00(0.01)  Forward time: 1.91(1.99)  Batch time: 1.92(2.01)
+2026-03-03 17:32:39,075   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:37:39,824   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:42:39,988   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:47:39,244   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:52:39,065   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 17:56:57,293   INFO  Train:    6/10 ( 60%) [10298/10299 (100%)]  Loss: 3.075 (1.97)  loss_hm=0.6109, loss_cls=0.0825, loss_bbox=0.8613, matched_ious=0.5227, loss_iou=0.0925, loss_iou_reg=0.2214, d_time=0.01(0.01), f_time=1.89(2.00), b_time=1.90(2.01)  LR: 1.125e-03  Time cost: 4:29:19/00:02 [4:29:20/22:58:57]  Acc_iter 61794       Data time: 0.01(0.01)  Forward time: 1.89(2.00)  Batch time: 1.90(2.01)
+2026-03-03 17:57:05,576   INFO  Train:    7/10 ( 70%) [   0/10299 (  0%)]  Loss: 1.750 (1.75)  loss_hm=0.5566, loss_cls=0.0850, loss_bbox=0.7878, matched_ious=0.5181, loss_iou=0.0914, loss_iou_reg=0.2292, d_time=3.83(3.83), f_time=3.20(3.20), b_time=7.03(7.03)  LR: 1.125e-03  Time cost: 00:06/18:45:16 [4:29:28/75:01:07]  Acc_iter 61795       Data time: 3.83(3.83)  Forward time: 3.20(3.20)  Batch time: 7.03(7.03)
+2026-03-03 18:02:01,357   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 18:03:56,382   INFO  Train:    7/10 ( 70%) [ 205/10299 (  2%)]  Loss: 1.900 (1.81)  loss_hm=0.5999, loss_cls=0.0810, loss_bbox=0.8197, matched_ious=0.5248, loss_iou=0.0917, loss_iou_reg=0.2199, d_time=0.00(0.03), f_time=2.00(2.00), b_time=2.01(2.03)  LR: 1.118e-03  Time cost: 06:57/5:40:50 [4:36:19/23:04:08]  Acc_iter 62000       Data time: 0.00(0.03)  Forward time: 2.00(2.00)  Batch time: 2.01(2.03)
+2026-03-03 18:07:01,521   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 18:12:01,449   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 18:17:00,117   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 18:22:00,375   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 18:26:59,796   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 18:32:00,087   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 18:37:00,224   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 18:37:21,918   INFO  Train:    7/10 ( 70%) [1205/10299 ( 12%)]  Loss: 2.251 (1.84)  loss_hm=0.6040, loss_cls=0.0814, loss_bbox=0.8501, matched_ious=0.5256, loss_iou=0.0928, loss_iou_reg=0.2199, d_time=0.00(0.02), f_time=1.93(1.99), b_time=1.94(2.01)  LR: 1.085e-03  Time cost: 40:22/5:04:30 [5:09:44/22:19:03]  Acc_iter 63000       Data time: 0.00(0.02)  Forward time: 1.93(1.99)  Batch time: 1.94(2.01)
+2026-03-03 18:37:22,150   INFO  
+2026-03-03 18:42:00,400   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 18:47:00,260   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 18:52:01,254   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 18:57:01,021   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:02:00,325   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:06:59,940   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:11:02,773   INFO  Train:    7/10 ( 70%) [2205/10299 ( 21%)]  Loss: 1.717 (1.89)  loss_hm=0.6280, loss_cls=0.0819, loss_bbox=0.9195, matched_ious=0.5215, loss_iou=0.0922, loss_iou_reg=0.2198, d_time=0.00(0.02), f_time=1.96(2.00), b_time=1.97(2.01)  LR: 1.050e-03  Time cost: 1:14:03/4:31:44 [5:43:25/21:49:03]  Acc_iter 64000       Data time: 0.00(0.02)  Forward time: 1.96(2.00)  Batch time: 1.97(2.01)
+2026-03-03 19:12:00,500   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:17:01,043   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:22:01,622   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:27:01,332   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:32:01,039   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:37:01,340   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:42:00,434   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:44:54,412   INFO  Train:    7/10 ( 70%) [3205/10299 ( 31%)]  Loss: 1.979 (1.88)  loss_hm=0.6018, loss_cls=0.0806, loss_bbox=0.8611, matched_ious=0.5260, loss_iou=0.0919, loss_iou_reg=0.2190, d_time=0.00(0.02), f_time=2.09(2.00), b_time=2.09(2.02)  LR: 1.015e-03  Time cost: 1:47:55/3:58:48 [6:17:17/21:18:53]  Acc_iter 65000       Data time: 0.00(0.02)  Forward time: 2.09(2.00)  Batch time: 2.09(2.02)
+2026-03-03 19:47:00,709   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:52:01,980   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 19:57:01,446   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:02:01,730   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:06:59,776   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:12:01,196   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:17:00,355   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:18:39,122   INFO  Train:    7/10 ( 70%) [4205/10299 ( 41%)]  Loss: 2.447 (1.88)  loss_hm=0.6145, loss_cls=0.0806, loss_bbox=0.8912, matched_ious=0.5232, loss_iou=0.0924, loss_iou_reg=0.2194, d_time=0.01(0.01), f_time=2.08(2.01), b_time=2.09(2.02)  LR: 9.787e-04  Time cost: 2:21:40/3:25:15 [6:51:01/20:45:56]  Acc_iter 66000       Data time: 0.01(0.01)  Forward time: 2.08(2.01)  Batch time: 2.09(2.02)
+2026-03-03 20:18:39,432   INFO  
+2026-03-03 20:22:01,477   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:27:01,395   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:32:01,260   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:37:01,412   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:42:00,715   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:47:01,418   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:52:00,174   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 20:52:22,067   INFO  Train:    7/10 ( 70%) [5205/10299 ( 51%)]  Loss: 1.843 (1.88)  loss_hm=0.6029, loss_cls=0.0797, loss_bbox=0.8602, matched_ious=0.5280, loss_iou=0.0914, loss_iou_reg=0.2174, d_time=0.01(0.01), f_time=1.97(2.01), b_time=1.97(2.02)  LR: 9.421e-04  Time cost: 2:55:23/2:51:36 [7:24:44/20:12:29]  Acc_iter 67000       Data time: 0.01(0.01)  Forward time: 1.97(2.01)  Batch time: 1.97(2.02)
+2026-03-03 20:57:00,146   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:02:00,705   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:07:00,820   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:12:00,580   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:17:00,476   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:22:00,525   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:26:12,207   INFO  Train:    7/10 ( 70%) [6205/10299 ( 60%)]  Loss: 1.892 (1.87)  loss_hm=0.5893, loss_cls=0.0786, loss_bbox=0.8497, matched_ious=0.5304, loss_iou=0.0912, loss_iou_reg=0.2168, d_time=0.01(0.01), f_time=1.93(2.01), b_time=1.94(2.02)  LR: 9.050e-04  Time cost: 3:29:13/2:18:01 [7:58:34/19:39:38]  Acc_iter 68000       Data time: 0.01(0.01)  Forward time: 1.93(2.01)  Batch time: 1.94(2.02)
+2026-03-03 21:27:00,142   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:32:01,029   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:37:00,033   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:42:01,365   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:47:00,135   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:52:00,138   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:57:01,350   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 21:59:57,786   INFO  Train:    7/10 ( 70%) [7205/10299 ( 70%)]  Loss: 1.855 (1.86)  loss_hm=0.5871, loss_cls=0.0787, loss_bbox=0.8308, matched_ious=0.5334, loss_iou=0.0908, loss_iou_reg=0.2159, d_time=0.00(0.01), f_time=2.00(2.01), b_time=2.00(2.02)  LR: 8.675e-04  Time cost: 4:02:58/1:44:19 [8:32:20/19:06:08]  Acc_iter 69000       Data time: 0.00(0.01)  Forward time: 2.00(2.01)  Batch time: 2.00(2.02)
+2026-03-03 21:59:57,984   INFO  
+2026-03-03 22:02:01,651   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 22:07:00,690   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 22:12:00,745   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 22:17:02,042   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 22:21:59,994   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 22:26:59,824   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 22:32:02,230   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 22:33:49,173   INFO  Train:    7/10 ( 70%) [8205/10299 ( 80%)]  Loss: 1.475 (1.86)  loss_hm=0.6010, loss_cls=0.0788, loss_bbox=0.8764, matched_ious=0.5288, loss_iou=0.0912, loss_iou_reg=0.2172, d_time=0.00(0.01), f_time=2.05(2.01), b_time=2.06(2.02)  LR: 8.297e-04  Time cost: 4:36:50/1:10:38 [9:06:11/18:32:58]  Acc_iter 70000       Data time: 0.00(0.01)  Forward time: 2.05(2.01)  Batch time: 2.06(2.02)
+2026-03-03 22:37:00,424   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 22:41:59,956   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 22:47:02,102   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 22:52:00,104   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 22:57:01,425   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:02:01,318   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:07:00,955   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:07:12,741   INFO  Train:    7/10 ( 70%) [9205/10299 ( 89%)]  Loss: 2.091 (1.86)  loss_hm=0.6013, loss_cls=0.0786, loss_bbox=0.8822, matched_ious=0.5332, loss_iou=0.0900, loss_iou_reg=0.2140, d_time=0.01(0.01), f_time=1.97(2.01), b_time=1.98(2.02)  LR: 7.917e-04  Time cost: 5:10:13/36:51 [9:39:35/17:58:02]  Acc_iter 71000       Data time: 0.01(0.01)  Forward time: 1.97(2.01)  Batch time: 1.98(2.02)
+2026-03-03 23:12:01,223   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:17:01,302   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:22:01,213   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:27:00,698   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:32:02,011   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:36:59,919   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:40:32,039   INFO  Train:    7/10 ( 70%) [10205/10299 ( 99%)]  Loss: 1.855 (1.86)  loss_hm=0.5959, loss_cls=0.0778, loss_bbox=0.8759, matched_ious=0.5334, loss_iou=0.0901, loss_iou_reg=0.2142, d_time=0.00(0.01), f_time=1.95(2.01), b_time=1.96(2.02)  LR: 7.536e-04  Time cost: 5:43:33/03:09 [10:12:54/17:23:12]  Acc_iter 72000       Data time: 0.00(0.01)  Forward time: 1.95(2.01)  Batch time: 1.96(2.02)
+2026-03-03 23:40:32,250   INFO  
+2026-03-03 23:42:00,955   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:44:26,820   INFO  Train:    7/10 ( 70%) [10298/10299 (100%)]  Loss: 2.206 (1.86)  loss_hm=0.5639, loss_cls=0.0747, loss_bbox=0.8145, matched_ious=0.5379, loss_iou=0.0901, loss_iou_reg=0.2126, d_time=0.00(0.01), f_time=51.29(2.01), b_time=51.30(2.02)  LR: 7.500e-04  Time cost: 5:47:27/00:02 [10:16:49/17:22:25]  Acc_iter 72093       Data time: 0.00(0.01)  Forward time: 51.29(2.01)  Batch time: 51.30(2.02)
+2026-03-03 23:44:34,389   INFO  Train:    8/10 ( 80%) [   0/10299 (  0%)]  Loss: 1.725 (1.73)  loss_hm=0.6160, loss_cls=0.0909, loss_bbox=0.7271, matched_ious=0.5554, loss_iou=0.0896, loss_iou_reg=0.2013, d_time=3.52(3.52), f_time=2.96(2.96), b_time=6.48(6.48)  LR: 7.500e-04  Time cost: 00:05/16:57:54 [10:16:57/50:53:44]  Acc_iter 72094       Data time: 3.52(3.52)  Forward time: 2.96(2.96)  Batch time: 6.48(6.48)
+2026-03-03 23:49:30,186   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:54:31,188   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-03 23:59:30,775   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:04:29,886   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:09:29,306   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:14:29,397   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:14:43,566   INFO  Train:    8/10 ( 80%) [ 906/10299 (  9%)]  Loss: 1.521 (1.77)  loss_hm=0.5732, loss_cls=0.0753, loss_bbox=0.8153, matched_ious=0.5397, loss_iou=0.0899, loss_iou_reg=0.2129, d_time=0.01(0.02), f_time=1.86(1.98), b_time=1.87(2.00)  LR: 7.155e-04  Time cost: 30:15/5:13:17 [10:47:06/16:40:18]  Acc_iter 73000       Data time: 0.01(0.02)  Forward time: 1.86(1.98)  Batch time: 1.87(2.00)
+2026-03-04 00:19:29,695   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:24:29,402   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:29:30,954   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:34:30,191   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:39:30,027   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:44:29,642   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:47:57,437   INFO  Train:    8/10 ( 80%) [1906/10299 ( 19%)]  Loss: 2.053 (1.74)  loss_hm=0.5519, loss_cls=0.0735, loss_bbox=0.7850, matched_ious=0.5443, loss_iou=0.0895, loss_iou_reg=0.2118, d_time=0.01(0.01), f_time=2.02(1.98), b_time=2.03(2.00)  LR: 6.774e-04  Time cost: 1:03:28/4:39:23 [11:20:20/16:05:05]  Acc_iter 74000       Data time: 0.01(0.01)  Forward time: 2.02(1.98)  Batch time: 2.03(2.00)
+2026-03-04 00:49:29,448   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:54:30,873   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 00:59:30,969   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:04:30,206   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:09:30,717   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:14:30,947   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:19:30,921   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:21:07,764   INFO  Train:    8/10 ( 80%) [2906/10299 ( 28%)]  Loss: 1.881 (1.75)  loss_hm=0.5665, loss_cls=0.0745, loss_bbox=0.8207, matched_ious=0.5420, loss_iou=0.0899, loss_iou_reg=0.2117, d_time=0.01(0.01), f_time=1.96(1.98), b_time=1.97(2.00)  LR: 6.396e-04  Time cost: 1:36:39/4:05:48 [11:53:30/15:30:40]  Acc_iter 75000       Data time: 0.01(0.01)  Forward time: 1.96(1.98)  Batch time: 1.97(2.00)
+2026-03-04 01:21:07,990   INFO  
+2026-03-04 01:24:31,129   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:29:30,082   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:34:30,288   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:39:29,942   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:44:30,481   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:49:29,479   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:54:28,710   INFO  Train:    8/10 ( 80%) [3906/10299 ( 38%)]  Loss: 1.751 (1.76)  loss_hm=0.5792, loss_cls=0.0742, loss_bbox=0.8504, matched_ious=0.5410, loss_iou=0.0891, loss_iou_reg=0.2108, d_time=0.00(0.01), f_time=1.91(1.98), b_time=1.91(2.00)  LR: 6.021e-04  Time cost: 2:10:00/3:32:43 [12:26:51/14:58:07]  Acc_iter 76000       Data time: 0.00(0.01)  Forward time: 1.91(1.98)  Batch time: 1.91(2.00)
+2026-03-04 01:54:29,475   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 01:59:30,400   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 02:04:29,429   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
+2026-03-04 02:09:30,895   INFO  Save latest model to /root/autodl-tmp/MambaFusion-main/output/mambafusion_models/mamba_fusion/default/ckpt/latest_model
