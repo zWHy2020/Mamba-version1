@@ -161,6 +161,21 @@ class MambaFusion(Detector3DTemplate):
         }
 
         loss = loss_trans
+        aux_loss_keys = [
+            'loss_moe_lb', 'loss_moe_z', 'loss_moe_cap',
+            'loss_mask_budget', 'loss_null_budget',
+            'loss_fusion_distill'
+        ]
+        for key in aux_loss_keys:
+            if key not in batch_dict:
+                continue
+            aux_loss = batch_dict[key]
+            if aux_loss is None:
+                continue
+            loss = loss + aux_loss
+            tb_dict[key] = aux_loss.item()
+
+        tb_dict['loss_total'] = loss.item()
         return loss, tb_dict, disp_dict
 
     def post_processing(self, batch_dict):
