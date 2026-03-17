@@ -54,13 +54,17 @@ class ConvFuser(nn.Module):
         self.topk_eval = model_cfg.get('TOPK_EVAL', 1)
         self.enforce_consistent_topk = model_cfg.get('ENFORCE_CONSISTENT_TOPK', True)
 
+        self.use_continuous_soft_gate = model_cfg.get('USE_CONTINUOUS_SOFT_GATE', True)
+        self.sparse_spatial_gate.use_continuous_soft_gate = self.use_continuous_soft_gate
         self.use_soft_mask_train = model_cfg.get('USE_SOFT_MASK_TRAIN', True)
         self.soft_mask_threshold = model_cfg.get('SOFT_MASK_THRESHOLD', 0.5)
+        self.soft_mask_temperature = model_cfg.get('SOFT_MASK_TEMPERATURE', 0.25)
 
         self.loss_weight_lb = model_cfg.get('LOSS_WEIGHT_LB', 0.0)
         self.loss_weight_z = model_cfg.get('LOSS_WEIGHT_Z', 0.0)
         self.loss_weight_cap = model_cfg.get('LOSS_WEIGHT_CAP', 0.0)
         self.loss_weight_budget = model_cfg.get('LOSS_WEIGHT_BUDGET', 0.0)
+        self.loss_weight_budget_shape = model_cfg.get('LOSS_WEIGHT_BUDGET_SHAPE', 0.0)
         self.loss_weight_null = model_cfg.get('LOSS_WEIGHT_NULL', 0.0)
         self.loss_weight_distill = model_cfg.get('LOSS_WEIGHT_DISTILL', 0.0)
 
@@ -473,7 +477,7 @@ class ConvFuser(nn.Module):
                 cat_bev = self.mamba_forward(img_bev, lidar_bev)
             if spatial_keep_mask is not None:
                 if self.training and self.use_soft_mask_train and gate_stats is not None:
-                    soft_keep_mask = torch.clamp(gate_stats['keep_score_2d'], min=0.0, max=1.0)
+                    soft_keep_mask = torch.sigmoid((gate_stats['keep_score_2d'] - self.soft_mask_threshold) / max(self.soft_mask_temperature, 1e-6))
                     cat_bev = cat_bev * soft_keep_mask
                     batch_dict['fusion_soft_keep_mask'] = soft_keep_mask
                 else:
@@ -482,7 +486,7 @@ class ConvFuser(nn.Module):
             cat_bev = torch.cat([img_bev, lidar_bev], dim=1)
             if spatial_keep_mask is not None:
                 if self.training and self.use_soft_mask_train and gate_stats is not None:
-                    soft_keep_mask = torch.clamp(gate_stats['keep_score_2d'], min=0.0, max=1.0)
+                    soft_keep_mask = torch.sigmoid((gate_stats['keep_score_2d'] - self.soft_mask_threshold) / max(self.soft_mask_temperature, 1e-6))
                     cat_bev = cat_bev * soft_keep_mask
                     batch_dict['fusion_soft_keep_mask'] = soft_keep_mask
                 else:
@@ -544,6 +548,13 @@ class ConvFuser(nn.Module):
             keep_score = gate_stats['keep_score']
             loss_budget = (keep_score.mean() - self.mask_budget_target).pow(2)
             batch_dict['loss_mask_budget'] = self.loss_weight_budget * loss_budget
+
+        if self.loss_weight_budget_shape > 0:
+            keep_flat = gate_stats['keep_score'].squeeze(-1)
+            keep_var = keep_flat.var(dim=1, unbiased=False).mean()
+            target_var = self.mask_budget_target * (1.0 - self.mask_budget_target)
+            loss_budget_shape = (keep_var - target_var).pow(2)
+            batch_dict['loss_mask_budget_shape'] = self.loss_weight_budget_shape * loss_budget_shape
 
         if self.loss_weight_null > 0 and num_experts >= 3:
             p_null = probs[..., 2]

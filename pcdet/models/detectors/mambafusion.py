@@ -163,7 +163,7 @@ class MambaFusion(Detector3DTemplate):
         loss = loss_trans
         aux_loss_keys = [
             'loss_moe_lb', 'loss_moe_z', 'loss_moe_cap',
-            'loss_mask_budget', 'loss_null_budget',
+            'loss_mask_budget', 'loss_mask_budget_shape', 'loss_null_budget',
             'loss_fusion_distill'
         ]
         for key in aux_loss_keys:

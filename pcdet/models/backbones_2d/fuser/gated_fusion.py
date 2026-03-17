@@ -153,6 +153,7 @@ class SparseMoESpatialGate(nn.Module):
             nn.SiLU(inplace=True),
             nn.Linear(hidden_dim, self.num_experts)
         )
+        self.use_continuous_soft_gate = False
 
     def _topk_hard_gate(self, probs: torch.Tensor) -> torch.Tensor:
         topk = max(1, min(self.topk, probs.shape[-1]))
@@ -184,7 +185,7 @@ class SparseMoESpatialGate(nn.Module):
             logits = logits + mask_logits
 
         probs = torch.softmax(logits, dim=-1)
-        gate = self._topk_hard_gate(probs)
+        gate = probs if self.use_continuous_soft_gate else self._topk_hard_gate(probs)
 
         gate_cam = gate[..., 0:1]
         gate_lidar = gate[..., 1:2]
