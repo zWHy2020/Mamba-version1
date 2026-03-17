@@ -52,6 +52,7 @@ class ConvFuser(nn.Module):
         )
         self.topk_train = model_cfg.get('TOPK_TRAIN', 2)
         self.topk_eval = model_cfg.get('TOPK_EVAL', 1)
+        self.enforce_consistent_topk = model_cfg.get('ENFORCE_CONSISTENT_TOPK', True)
 
         self.use_soft_mask_train = model_cfg.get('USE_SOFT_MASK_TRAIN', True)
         self.soft_mask_threshold = model_cfg.get('SOFT_MASK_THRESHOLD', 0.5)
@@ -458,7 +459,8 @@ class ConvFuser(nn.Module):
         spatial_keep_mask = None
         gate_stats = None
         if self.use_gated_fusion:
-            self.sparse_spatial_gate.topk = self.topk_train if self.training else self.topk_eval
+            topk_to_use = self.topk_train if (self.training or self.enforce_consistent_topk) else self.topk_eval
+            self.sparse_spatial_gate.topk = topk_to_use
             img_bev, lidar_bev, spatial_keep_mask, gate_stats = self.sparse_spatial_gate(
                 img_bev, lidar_bev, modality_mask=modality_mask
             )
