@@ -50,6 +50,30 @@ class ConvFuser(nn.Module):
             topk=model_cfg.get('SPARSE_GATE_TOPK', 1),
             include_null_expert=model_cfg.get('SPARSE_GATE_INCLUDE_NULL_EXPERT', True),
         )
+        self.topk_train = model_cfg.get('TOPK_TRAIN', 2)
+        self.topk_eval = model_cfg.get('TOPK_EVAL', 1)
+        self.enforce_consistent_topk = model_cfg.get('ENFORCE_CONSISTENT_TOPK', True)
+
+        self.use_continuous_soft_gate = model_cfg.get('USE_CONTINUOUS_SOFT_GATE', True)
+        self.sparse_spatial_gate.use_continuous_soft_gate = self.use_continuous_soft_gate
+        self.use_soft_mask_train = model_cfg.get('USE_SOFT_MASK_TRAIN', True)
+        self.soft_mask_threshold = model_cfg.get('SOFT_MASK_THRESHOLD', 0.5)
+        self.soft_mask_temperature = model_cfg.get('SOFT_MASK_TEMPERATURE', 0.25)
+
+        self.loss_weight_lb = model_cfg.get('LOSS_WEIGHT_LB', 0.0)
+        self.loss_weight_z = model_cfg.get('LOSS_WEIGHT_Z', 0.0)
+        self.loss_weight_cap = model_cfg.get('LOSS_WEIGHT_CAP', 0.0)
+        self.loss_weight_budget = model_cfg.get('LOSS_WEIGHT_BUDGET', 0.0)
+        self.loss_weight_budget_shape = model_cfg.get('LOSS_WEIGHT_BUDGET_SHAPE', 0.0)
+        self.loss_weight_null = model_cfg.get('LOSS_WEIGHT_NULL', 0.0)
+        self.loss_weight_distill = model_cfg.get('LOSS_WEIGHT_DISTILL', 0.0)
+
+        self.capacity_factor = model_cfg.get('CAPACITY_FACTOR', 1.25)
+        self.mask_budget_target = model_cfg.get('MASK_BUDGET_TARGET', 0.7)
+        self.null_budget_target = model_cfg.get('NULL_BUDGET_TARGET', 0.15)
+
+        self.use_sparse_distill = model_cfg.get('USE_SPARSE_DISTILL', False)
+        self.distill_detach_teacher = model_cfg.get('DISTILL_DETACH_TEACHER', True)
         self.use_checkpoint = model_cfg.get('USE_CHECKPOINT', True)
         self.use_merge_after = model_cfg.get('USE_MERGE_AFTER', False)
         if self.use_merge_after:
@@ -429,13 +453,18 @@ class ConvFuser(nn.Module):
         """
         img_bev = batch_dict['spatial_features_img']
         lidar_bev = batch_dict['spatial_features']
+        img_bev_teacher = img_bev
+        lidar_bev_teacher = lidar_bev
 
         modality_mask = None
         if self.use_modality_dropout:
             img_bev, lidar_bev, modality_mask = self.modality_dropout(img_bev, lidar_bev)
 
         spatial_keep_mask = None
+        gate_stats = None
         if self.use_gated_fusion:
+            topk_to_use = self.topk_train if (self.training or self.enforce_consistent_topk) else self.topk_eval
+            self.sparse_spatial_gate.topk = topk_to_use
             img_bev, lidar_bev, spatial_keep_mask, gate_stats = self.sparse_spatial_gate(
                 img_bev, lidar_bev, modality_mask=modality_mask
             )
@@ -447,20 +476,90 @@ class ConvFuser(nn.Module):
             else:
                 cat_bev = self.mamba_forward(img_bev, lidar_bev)
             if spatial_keep_mask is not None:
-                cat_bev = cat_bev * spatial_keep_mask
+                if self.training and self.use_soft_mask_train and gate_stats is not None:
+                    soft_keep_mask = torch.sigmoid((gate_stats['keep_score_2d'] - self.soft_mask_threshold) / max(self.soft_mask_temperature, 1e-6))
+                    cat_bev = cat_bev * soft_keep_mask
+                    batch_dict['fusion_soft_keep_mask'] = soft_keep_mask
+                else:
+                    cat_bev = cat_bev * spatial_keep_mask
         else:
             cat_bev = torch.cat([img_bev, lidar_bev], dim=1)
             if spatial_keep_mask is not None:
-                cat_bev = cat_bev * spatial_keep_mask
+                if self.training and self.use_soft_mask_train and gate_stats is not None:
+                    soft_keep_mask = torch.sigmoid((gate_stats['keep_score_2d'] - self.soft_mask_threshold) / max(self.soft_mask_temperature, 1e-6))
+                    cat_bev = cat_bev * soft_keep_mask
+                    batch_dict['fusion_soft_keep_mask'] = soft_keep_mask
+                else:
+                    cat_bev = cat_bev * spatial_keep_mask
+
+        if self.training and self.use_sparse_distill and self.use_gated_fusion and self.loss_weight_distill > 0:
+            if self.use_vmamba:
+                with torch.no_grad() if self.distill_detach_teacher else torch.enable_grad():
+                    teacher_cat_bev = self.mamba_forward(img_bev_teacher, lidar_bev_teacher)
+            else:
+                with torch.no_grad() if self.distill_detach_teacher else torch.enable_grad():
+                    teacher_cat_bev = torch.cat([img_bev_teacher, lidar_bev_teacher], dim=1)
+            if self.distill_detach_teacher:
+                teacher_cat_bev = teacher_cat_bev.detach()
+            loss_distill = F.mse_loss(cat_bev, teacher_cat_bev)
+            batch_dict['loss_fusion_distill'] = self.loss_weight_distill * loss_distill
+
         if self.use_merge_after:
             for block in self.merge_blocks:
                 cat_bev = block(cat_bev)
         mm_bev = self.conv(cat_bev) # [2, 128, 360, 360]
 
+        if self.training and gate_stats is not None:
+            self._collect_moe_aux_losses(gate_stats, batch_dict)
+
         if spatial_keep_mask is not None:
             batch_dict['fusion_spatial_keep_mask'] = spatial_keep_mask
         batch_dict['spatial_features'] = mm_bev
         return batch_dict
+
+    def _collect_moe_aux_losses(self, gate_stats, batch_dict):
+        probs = gate_stats['router_prob']  # [B, N, E]
+        logits = gate_stats['router_logits']
+        bsz, num_tokens, num_experts = probs.shape
+
+        if self.loss_weight_lb > 0:
+            hard_idx = torch.argmax(probs, dim=-1)
+            one_hot = F.one_hot(hard_idx, num_classes=num_experts).float()
+            f_i = one_hot.mean(dim=(0, 1))
+            p_i = probs.mean(dim=(0, 1))
+            loss_lb = num_experts * torch.sum(f_i * p_i)
+            batch_dict['loss_moe_lb'] = self.loss_weight_lb * loss_lb
+
+        if self.loss_weight_z > 0:
+            loss_z = torch.logsumexp(logits, dim=-1).pow(2).mean()
+            batch_dict['loss_moe_z'] = self.loss_weight_z * loss_z
+
+        if self.loss_weight_cap > 0:
+            hard_idx = torch.argmax(probs, dim=-1)
+            counts = []
+            for i in range(num_experts):
+                counts.append((hard_idx == i).float().sum())
+            counts = torch.stack(counts)
+            cap = torch.ceil(torch.tensor(self.capacity_factor * bsz * num_tokens / float(num_experts), device=probs.device))
+            loss_cap = torch.clamp(counts - cap, min=0.0).mean() / (bsz * num_tokens + 1e-6)
+            batch_dict['loss_moe_cap'] = self.loss_weight_cap * loss_cap
+
+        if self.loss_weight_budget > 0:
+            keep_score = gate_stats['keep_score']
+            loss_budget = (keep_score.mean() - self.mask_budget_target).pow(2)
+            batch_dict['loss_mask_budget'] = self.loss_weight_budget * loss_budget
+
+        if self.loss_weight_budget_shape > 0:
+            keep_flat = gate_stats['keep_score'].squeeze(-1)
+            keep_var = keep_flat.var(dim=1, unbiased=False).mean()
+            target_var = self.mask_budget_target * (1.0 - self.mask_budget_target)
+            loss_budget_shape = (keep_var - target_var).pow(2)
+            batch_dict['loss_mask_budget_shape'] = self.loss_weight_budget_shape * loss_budget_shape
+
+        if self.loss_weight_null > 0 and num_experts >= 3:
+            p_null = probs[..., 2]
+            loss_null = torch.clamp(p_null.mean() - self.null_budget_target, min=0.0)
+            batch_dict['loss_null_budget'] = self.loss_weight_null * loss_null
 
     def mamba_forward(self, img_bev, lidar_bev):
         ups_img = []

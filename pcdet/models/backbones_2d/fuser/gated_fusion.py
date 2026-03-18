@@ -153,6 +153,7 @@ class SparseMoESpatialGate(nn.Module):
             nn.SiLU(inplace=True),
             nn.Linear(hidden_dim, self.num_experts)
         )
+        self.use_continuous_soft_gate = False
 
     def _topk_hard_gate(self, probs: torch.Tensor) -> torch.Tensor:
         topk = max(1, min(self.topk, probs.shape[-1]))
@@ -184,11 +185,12 @@ class SparseMoESpatialGate(nn.Module):
             logits = logits + mask_logits
 
         probs = torch.softmax(logits, dim=-1)
-        gate = self._topk_hard_gate(probs)
+        gate = probs if self.use_continuous_soft_gate else self._topk_hard_gate(probs)
 
         gate_cam = gate[..., 0:1]
         gate_lidar = gate[..., 1:2]
-        keep_mask = ((gate_cam + gate_lidar) > 0).to(dtype=z_cam.dtype)
+        keep_score = (gate_cam + gate_lidar).to(dtype=z_cam.dtype)
+        keep_mask = (keep_score > 0).to(dtype=z_cam.dtype)
 
         xhat_cam = x_cam * gate_cam
         xhat_lidar = x_lidar * gate_lidar
@@ -196,10 +198,15 @@ class SparseMoESpatialGate(nn.Module):
         zhat_cam = xhat_cam.reshape(bsz, h, w, -1).permute(0, 3, 1, 2).contiguous()
         zhat_lidar = xhat_lidar.reshape(bsz, h, w, -1).permute(0, 3, 1, 2).contiguous()
         keep_mask_2d = keep_mask.reshape(bsz, h, w, 1).permute(0, 3, 1, 2).contiguous()
+        keep_score_2d = keep_score.reshape(bsz, h, w, 1).permute(0, 3, 1, 2).contiguous()
 
         gate_stats = {
+            'router_logits': logits,
             'router_prob': probs,
             'router_gate': gate,
             'keep_ratio': keep_mask.float().mean(dim=1),
+            'keep_score': keep_score,
+            'keep_score_2d': keep_score_2d,
+            'include_null_expert': torch.tensor(float(self.include_null_expert), device=z_cam.device, dtype=z_cam.dtype),
         }
         return zhat_cam, zhat_lidar, keep_mask_2d, gate_stats
