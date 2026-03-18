@@ -5,6 +5,7 @@ from ..backbones_2d import fuser
 from ...utils.spconv_utils import find_all_spconv_keys
 from ..vmamba import build_vssm_model
 import torch.profiler
+import torch
 from torch.nn.parameter import is_lazy
 class MambaFusion(Detector3DTemplate):
     def __init__(self, model_cfg, num_class, dataset):
@@ -37,6 +38,63 @@ class MambaFusion(Detector3DTemplate):
                 ]
         self.module_list = self.build_networks()
         self.time_list = []
+        self._init_distill_conflict_cfg()
+        self._distill_param_cache = None
+
+    def _init_distill_conflict_cfg(self):
+        fuser_cfg = self.model_cfg.get('FUSER', {})
+        self.distill_warmup_steps = int(fuser_cfg.get('DISTILL_WARMUP_STEPS', 0))
+        self.enable_distill_grad_monitor = bool(fuser_cfg.get('ENABLE_DISTILL_GRAD_MONITOR', False))
+        self.distill_conflict_threshold = float(fuser_cfg.get('DISTILL_CONFLICT_THRESHOLD', 0.0))
+        self.distill_conflict_mode = str(fuser_cfg.get('DISTILL_CONFLICT_MODE', 'none')).lower()
+        self.distill_conflict_drop_scale = float(fuser_cfg.get('DISTILL_CONFLICT_DROP_SCALE', 0.0))
+
+    def _get_distill_monitor_params(self):
+        if self._distill_param_cache is not None:
+            return self._distill_param_cache
+        target_module = getattr(self, 'fuser', None)
+        if target_module is None:
+            self._distill_param_cache = []
+            return self._distill_param_cache
+        params = [p for p in target_module.parameters() if p.requires_grad]
+        self._distill_param_cache = params
+        return self._distill_param_cache
+
+    @staticmethod
+    def _flatten_valid_grads(grad_list):
+        chunks = []
+        for grad in grad_list:
+            if grad is None:
+                continue
+            chunks.append(grad.reshape(-1))
+        if not chunks:
+            return None
+        return torch.cat(chunks)
+
+    def _compute_pair_grad_stats(self, loss_a, loss_b, params):
+        if not params:
+            return None
+        grads_a = torch.autograd.grad(
+            loss_a, params, retain_graph=True, create_graph=False, allow_unused=True
+        )
+        grads_b = torch.autograd.grad(
+            loss_b, params, retain_graph=True, create_graph=False, allow_unused=True
+        )
+        flat_a = self._flatten_valid_grads(grads_a)
+        flat_b = self._flatten_valid_grads(grads_b)
+        if flat_a is None or flat_b is None:
+            return None
+        norm_a = torch.norm(flat_a, p=2)
+        norm_b = torch.norm(flat_b, p=2)
+        eps = flat_a.new_tensor(1e-12)
+        cosine = torch.dot(flat_a, flat_b) / (norm_a * norm_b + eps)
+        ratio = norm_b / (norm_a + eps)
+        return {
+            'norm_a': norm_a.detach(),
+            'norm_b': norm_b.detach(),
+            'cosine': cosine.detach(),
+            'ratio': ratio.detach(),
+        }
        
     def build_neck(self,model_info_dict):
         if self.model_cfg.get('NECK', None) is None:
@@ -163,8 +221,7 @@ class MambaFusion(Detector3DTemplate):
         loss = loss_trans
         aux_loss_keys = [
             'loss_moe_lb', 'loss_moe_z', 'loss_moe_cap',
-            'loss_mask_budget', 'loss_mask_budget_shape', 'loss_null_budget',
-            'loss_fusion_distill'
+            'loss_mask_budget', 'loss_mask_budget_shape', 'loss_null_budget'
         ]
         for key in aux_loss_keys:
             if key not in batch_dict:
@@ -174,6 +231,38 @@ class MambaFusion(Detector3DTemplate):
                 continue
             loss = loss + aux_loss
             tb_dict[key] = aux_loss.item()
+
+        raw_distill = batch_dict.get('loss_fusion_distill', None)
+        if raw_distill is not None:
+            warmup_scale = 1.0
+            if self.distill_warmup_steps > 0:
+                cur_step = int(self.global_step.item())
+                warmup_scale = min(1.0, float(cur_step + 1) / float(self.distill_warmup_steps))
+            distill_loss = raw_distill * warmup_scale
+            tb_dict['loss_fusion_distill_raw'] = raw_distill.item()
+            tb_dict['loss_fusion_distill_warmup_scale'] = warmup_scale
+
+            if self.enable_distill_grad_monitor and self.distill_conflict_mode in ('drop', 'downweight'):
+                monitor_params = self._get_distill_monitor_params()
+                grad_stats = self._compute_pair_grad_stats(loss_trans, distill_loss, monitor_params)
+                if grad_stats is not None:
+                    grad_cos = float(grad_stats['cosine'].item())
+                    grad_ratio = float(grad_stats['ratio'].item())
+                    tb_dict['grad_cos_distill_vs_det'] = grad_cos
+                    tb_dict['grad_ratio_distill_vs_det'] = grad_ratio
+                    if grad_cos < self.distill_conflict_threshold:
+                        if self.distill_conflict_mode == 'drop':
+                            distill_loss = distill_loss * 0.0
+                            tb_dict['distill_conflict_action'] = 1.0
+                        elif self.distill_conflict_mode == 'downweight':
+                            scale = max(0.0, min(1.0, self.distill_conflict_drop_scale))
+                            distill_loss = distill_loss * scale
+                            tb_dict['distill_conflict_action'] = scale
+                    else:
+                        tb_dict['distill_conflict_action'] = 1.0
+
+            loss = loss + distill_loss
+            tb_dict['loss_fusion_distill'] = distill_loss.item()
 
         tb_dict['loss_total'] = loss.item()
         return loss, tb_dict, disp_dict
