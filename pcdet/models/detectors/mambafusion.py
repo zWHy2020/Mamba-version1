@@ -74,6 +74,8 @@ class MambaFusion(Detector3DTemplate):
     def _compute_pair_grad_stats(self, loss_a, loss_b, params):
         if not params:
             return None
+        if (not torch.is_grad_enabled()) or (not getattr(loss_a, 'requires_grad', False)) or (not getattr(loss_b, 'requires_grad', False)):
+            return None
         grads_a = torch.autograd.grad(
             loss_a, params, retain_graph=True, create_graph=False, allow_unused=True
         )
