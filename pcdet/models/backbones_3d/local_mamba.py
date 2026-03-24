@@ -236,7 +236,10 @@ class GlobalMamba(nn.Module):
                 out_feat_m2 = cp.checkpoint(mamba_layer1, feat_m2, None, use_reentrant=False)
             else:
                 out_feat_m2 = mamba_layer1(feat_m2, None) # [1, 22095, 128]
-            out_feat_3d_s2[b_mask_m2] = (out_feat_m2[0]).squeeze(0)[inds_next_to_curt_s2[i]]
+            src_feat_s2 = (out_feat_m2[0]).squeeze(0)[inds_next_to_curt_s2[i]]
+            if src_feat_s2.dtype != out_feat_3d_s2.dtype:
+                src_feat_s2 = src_feat_s2.to(dtype=out_feat_3d_s2.dtype)
+            out_feat_3d_s2[b_mask_m2] = src_feat_s2
 
         x_s2 = replace_feature(x_s2, self.norm(out_feat_3d_s2))
 
@@ -252,7 +255,10 @@ class GlobalMamba(nn.Module):
                 out_feat_back = cp.checkpoint(mamba_layer2, feat_back, None, use_reentrant=False)
             else:
                 out_feat_back = mamba_layer2(feat_back, None)
-            out_feat_3d_s1[b_mask_m1] = (out_feat_back[0]).squeeze(0).flip(0)[inds_next_to_curt_s1[i]]
+            src_feat_s1 = (out_feat_back[0]).squeeze(0).flip(0)[inds_next_to_curt_s1[i]]
+            if src_feat_s1.dtype != out_feat_3d_s1.dtype:
+                src_feat_s1 = src_feat_s1.to(dtype=out_feat_3d_s1.dtype)
+            out_feat_3d_s1[b_mask_m1] = src_feat_s1
 
         x_s1 = replace_feature(x_s1, self.norm_back(out_feat_3d_s1))
 
