@@ -500,3 +500,108 @@ A. 对代价矩阵做 finite 兜底（`torch.nan_to_num` + `np.nan_to_num`）
 - Hungarian method (Kuhn, 1955): https://www.jstor.org/stable/2307832
 - SciPy linear_sum_assignment: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linear_sum_assignment.html
 - Floating-point reference (Goldberg, 1991): https://dl.acm.org/doi/10.1145/103162.103163
+
+## 训练时保护是否已加入？已加入。
+
+已在 `train_one_epoch` 中加入如下逻辑：
+- 每个 iter 前向后检查 `torch.isfinite(loss)`；
+- 若非有限：记录 warning、`optimizer.zero_grad(set_to_none=True)`、`accumulated_iter += 1`、`continue` 跳过本次更新。
+
+### 该保护对训练的影响（数学上）
+
+设标准更新为：
+`theta_{t+1} = theta_t - eta_t * g_t`。
+
+加入保护后，可写为：
+`theta_{t+1} = theta_t - I_t * eta_t * g_t`，其中 `I_t = 1` 当 `loss` 有限，否则 `I_t = 0`。
+
+即：非有限步被置为“零更新步”。
+
+#### 正向影响
+- 阻断非有限梯度污染优化器状态（动量/二阶矩等），避免一次坏步把后续训练拖入发散。
+
+#### 代价/副作用
+- 若 `I_t=0` 频繁发生，有效更新步数减少，等价于训练有效样本利用率下降，可能导致收敛变慢或最终精度下降。
+- 该机制是“安全兜底”，不是根因修复；根因仍需通过数值稳定化（如 AMP 敏感路径转 fp32、范围约束）处理。
+
+### 论文与文档依据（真实链接）
+
+- Mixed Precision Training（loss scaling、非有限值问题背景）: https://arxiv.org/abs/1710.03740
+- On the difficulty of training recurrent neural networks（梯度爆炸/不稳定背景）: https://proceedings.mlr.press/v28/pascanu13.html
+- Adam: A Method for Stochastic Optimization（优化器状态被异常梯度影响的背景）: https://arxiv.org/abs/1412.6980
+- PyTorch AMP 文档: https://pytorch.org/docs/stable/notes/amp_examples.html
+
+## 详细定位方案：如何找到上游 NaN/Inf 源
+
+按“最小扰动 -> 精确定位”顺序执行：
+
+1. **先看训练日志中的 `bad_tb_keys`**
+   - 训练循环已在 non-finite loss 时输出 `bad_tb_keys`，可直接知道是 heatmap/cls/bbox/iou 哪一路先失稳。
+
+2. **固定随机性并缩小复现窗口**
+   - 固定种子，先跑到首次 non-finite 出现的 iter 附近（例如前 200~500 iter），减少排查范围。
+
+3. **二分禁用法定位模块**
+   - 先禁用新增高开销/高不稳定组件（gated fusion、sparse distill），看 non-finite 是否消失；
+   - 若消失，再逐个恢复，找触发最敏感开关。
+
+4. **对数值敏感算子优先做 fp32**
+   - `exp/log/div/cdist` 路径优先 fp32（当前 TransFusion matching 已做）。
+
+5. **若仍持续出现**
+   - 记录首次非有限 iter 的 batch id，并保存当时关键张量统计（min/max/mean、finite 比例），对问题样本做离线复盘。
+
+## 二分禁用法：具体怎么改（可直接执行）
+
+目标：在最少实验次数下定位“哪个模块最先引入 NaN/Inf”。
+
+### 基线命令（保留你当前 AMP 配置）
+
+```bash
+bash tools/scripts/dist_train.sh 4 \
+  --cfg_file tools/cfgs/mambafusion_models/mamba_fusion.yaml \
+  --sync_bn \
+  --pretrained_model ckpts/pretrained.pth \
+  --use_amp \
+  --logger_iter_interval 200 \
+  --extra_tag nanloc-base
+```
+
+### 第1层二分（先一刀切关掉 FUSER 里最重的两个新增项）
+
+```bash
+bash tools/scripts/dist_train.sh 4 \
+  --cfg_file tools/cfgs/mambafusion_models/mamba_fusion.yaml \
+  --sync_bn \
+  --pretrained_model ckpts/pretrained.pth \
+  --use_amp \
+  --logger_iter_interval 200 \
+  --extra_tag nanloc-fuser-off \
+  --set MODEL.FUSER.USE_GATED_FUSION False MODEL.FUSER.USE_SPARSE_DISTILL False
+```
+
+- 若 NaN/Inf 明显减少或消失：问题在这组内；进入第2层。
+- 若无变化：问题主要不在这组，转去检查 backbone/head 路径。
+
+### 第2层二分（在这组内逐个恢复）
+
+A. 只开门控：
+```bash
+... --set MODEL.FUSER.USE_GATED_FUSION True MODEL.FUSER.USE_SPARSE_DISTILL False
+```
+
+B. 只开蒸馏：
+```bash
+... --set MODEL.FUSER.USE_GATED_FUSION False MODEL.FUSER.USE_SPARSE_DISTILL True
+```
+
+比较 A/B 与“全关”三组的首个 non-finite iter 与 `bad_tb_keys`，即可定位敏感开关。
+
+### 评估指标（每组固定跑到同一迭代上限，例如 1000 iter）
+
+1. 首次出现 non-finite 的 iter；
+2. `bad_tb_keys` 出现频率；
+3. `b_time(avg)` 与是否 OOM；
+4. 是否出现 Hungarian `invalid numeric entries`。
+
+这就是“二分禁用法”的可执行版本：先分组关，再组内单开，最少实验次数定位最敏感组件。

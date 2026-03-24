@@ -4,6 +4,7 @@ import torch
 import tqdm
 import time
 import glob
+import math
 from torch.nn.utils import clip_grad_norm_
 from pcdet.utils import common_utils, commu_utils
 
@@ -12,6 +13,21 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
                     rank, tbar, total_it_each_epoch, dataloader_iter, tb_log=None, leave_pbar=False, 
                     use_logger_to_record=False, logger=None, logger_iter_interval=50, cur_epoch=None, 
                     total_epochs=None, ckpt_save_dir=None, ckpt_save_time_interval=300, show_gpu_stat=False, use_amp=False, accumulation_steps=1, balance=False):
+    def _nonfinite_keys_from_tb(tb):
+        bad = []
+        for k, v in (tb or {}).items():
+            if isinstance(v, torch.Tensor):
+                if not torch.isfinite(v).all():
+                    bad.append(k)
+            else:
+                try:
+                    fv = float(v)
+                    if not math.isfinite(fv):
+                        bad.append(k)
+                except Exception:
+                    pass
+        return bad
+
     if total_it_each_epoch == len(train_loader):
         dataloader_iter = iter(train_loader)
 
@@ -73,9 +89,10 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
 
         if not torch.isfinite(loss):
             if logger is not None and rank == 0:
+                bad_tb_keys = _nonfinite_keys_from_tb(tb_dict)
                 logger.warning(
-                    'Non-finite loss detected at iter %d (epoch %d). Skip this iteration.',
-                    accumulated_iter, cur_epoch + 1
+                    'Non-finite loss detected at iter %d (epoch %d). Skip this iteration. bad_tb_keys=%s',
+                    accumulated_iter, cur_epoch + 1, bad_tb_keys
                 )
             optimizer.zero_grad(set_to_none=True)
             accumulated_iter += 1
