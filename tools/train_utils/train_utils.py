@@ -71,6 +71,17 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
         with torch.cuda.amp.autocast(enabled=use_amp):
             loss, tb_dict, disp_dict = model_func(model, batch) 
 
+        if not torch.isfinite(loss):
+            if logger is not None and rank == 0:
+                logger.warning(
+                    'Non-finite loss detected at iter %d (epoch %d). Skip this iteration.',
+                    accumulated_iter, cur_epoch + 1
+                )
+            optimizer.zero_grad(set_to_none=True)
+            accumulated_iter += 1
+            end = time.time()
+            continue
+
         # scaler.scale(loss).backward()
         # scaler.unscale_(optimizer)
         # clip_grad_norm_(model.parameters(), optim_cfg.GRAD_NORM_CLIP)

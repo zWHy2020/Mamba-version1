@@ -332,19 +332,22 @@ class TransFusionHead(nn.Module):
     def get_targets_single(self, gt_bboxes_3d, gt_labels_3d, preds_dict):
         
         num_proposals = preds_dict["center"].shape[-1]
-        score = copy.deepcopy(preds_dict["heatmap"].detach())
-        center = copy.deepcopy(preds_dict["center"].detach())
-        height = copy.deepcopy(preds_dict["height"].detach())
-        dim = copy.deepcopy(preds_dict["dim"].detach())
-        rot = copy.deepcopy(preds_dict["rot"].detach())
+        # Hungarian matching is numerically sensitive; keep target construction in fp32.
+        score = copy.deepcopy(preds_dict["heatmap"].detach()).float()
+        center = copy.deepcopy(preds_dict["center"].detach()).float()
+        height = copy.deepcopy(preds_dict["height"].detach()).float()
+        dim = copy.deepcopy(preds_dict["dim"].detach()).float()
+        rot = copy.deepcopy(preds_dict["rot"].detach()).float()
         if "vel" in preds_dict.keys():
-            vel = copy.deepcopy(preds_dict["vel"].detach())
+            vel = copy.deepcopy(preds_dict["vel"].detach()).float()
         else:
             vel = None
 
         boxes_dict = self.decode_bbox(score, rot, dim, center, height, vel)
         bboxes_tensor = boxes_dict[0]["pred_boxes"]
-        gt_bboxes_tensor = gt_bboxes_3d.to(score.device)
+        if not torch.isfinite(bboxes_tensor).all():
+            bboxes_tensor = torch.nan_to_num(bboxes_tensor, nan=0.0, posinf=1e4, neginf=-1e4)
+        gt_bboxes_tensor = gt_bboxes_3d.to(score.device).float()
 
         assigned_gt_inds, ious = self.bbox_assigner.assign(
             bboxes_tensor, gt_bboxes_tensor, gt_labels_3d,

@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from scipy.optimize import linear_sum_assignment
 from pcdet.ops.iou3d_nms import iou3d_nms_cuda
 
@@ -111,9 +112,15 @@ class HungarianAssigner3D:
 
         # weighted sum of above three costs
         cost = cls_cost + reg_cost + iou_cost
+        if not torch.isfinite(cost).all():
+            # linear_sum_assignment requires finite numeric entries.
+            # Replace NaN/Inf with large finite sentinels to keep matching executable.
+            cost = torch.nan_to_num(cost, nan=1e8, posinf=1e8, neginf=-1e8)
 
         # 3. do Hungarian matching on CPU using linear_sum_assignment
-        cost = cost.detach().cpu()
+        cost = cost.detach().float().cpu().numpy()
+        if not np.isfinite(cost).all():
+            cost = np.nan_to_num(cost, nan=1e8, posinf=1e8, neginf=-1e8)
         matched_row_inds, matched_col_inds = linear_sum_assignment(cost)
         matched_row_inds = torch.from_numpy(matched_row_inds).to(bboxes.device)
         matched_col_inds = torch.from_numpy(matched_col_inds).to(bboxes.device)
