@@ -605,3 +605,16 @@ B. 只开蒸馏：
 4. 是否出现 Hungarian `invalid numeric entries`。
 
 这就是“二分禁用法”的可执行版本：先分组关，再组内单开，最少实验次数定位最敏感组件。
+
+## 最新报错解读：`zero_grad() got an unexpected keyword argument 'set_to_none'`
+
+这是接口兼容性问题：当前运行环境中的优化器 `zero_grad` 签名不接受 `set_to_none`。
+
+修复方式：
+- 先尝试 `zero_grad(set_to_none=True)`；
+- 若抛 `TypeError`，自动回退到 `zero_grad()`。
+
+这不改变优化目标，只影响清梯度的实现细节与显存复用行为。
+
+另一个日志现象：`output/home/.../tools/cfgs/...` 的输出路径异常，是因为调试脚本把绝对 cfg 路径传给了 `train.py` 的 tag 解析逻辑。
+修复方式：在脚本里 `cd tools/` 后使用相对 cfg 路径 `cfgs/...` 调用训练。

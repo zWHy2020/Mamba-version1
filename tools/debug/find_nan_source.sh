@@ -8,8 +8,16 @@ set -euo pipefail
 # It prints the exact commands and executes them one by one.
 
 PRETRAINED_MODEL="${1:-ckpts/pretrained.pth}"
-CFG_FILE="tools/cfgs/mambafusion_models/mamba_fusion.yaml"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+TOOLS_DIR="${REPO_ROOT}/tools"
+CFG_FILE="cfgs/mambafusion_models/mamba_fusion.yaml"
 NGPUS=4
+if [[ "${PRETRAINED_MODEL}" = /* ]]; then
+  PRETRAINED_MODEL_PATH="${PRETRAINED_MODEL}"
+else
+  PRETRAINED_MODEL_PATH="${REPO_ROOT}/${PRETRAINED_MODEL}"
+fi
 
 run_case() {
   local tag="$1"
@@ -17,14 +25,17 @@ run_case() {
   echo "=================================================="
   echo "[RUN] ${tag}"
   echo "=================================================="
-  bash tools/scripts/dist_train.sh ${NGPUS} \
-    --cfg_file ${CFG_FILE} \
-    --sync_bn \
-    --pretrained_model "${PRETRAINED_MODEL}" \
-    --use_amp \
-    --logger_iter_interval 200 \
-    --extra_tag "${tag}" \
-    "$@"
+  (
+    cd "${TOOLS_DIR}"
+    bash scripts/dist_train.sh ${NGPUS} \
+      --cfg_file ${CFG_FILE} \
+      --sync_bn \
+      --pretrained_model "${PRETRAINED_MODEL_PATH}" \
+      --use_amp \
+      --logger_iter_interval 200 \
+      --extra_tag "${tag}" \
+      "$@"
+  )
 }
 
 echo "[INFO] Step-1 baseline"

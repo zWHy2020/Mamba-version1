@@ -13,6 +13,12 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
                     rank, tbar, total_it_each_epoch, dataloader_iter, tb_log=None, leave_pbar=False, 
                     use_logger_to_record=False, logger=None, logger_iter_interval=50, cur_epoch=None, 
                     total_epochs=None, ckpt_save_dir=None, ckpt_save_time_interval=300, show_gpu_stat=False, use_amp=False, accumulation_steps=1, balance=False):
+    def _safe_zero_grad(opt):
+        try:
+            opt.zero_grad(set_to_none=True)
+        except TypeError:
+            opt.zero_grad()
+
     def _nonfinite_keys_from_tb(tb):
         bad = []
         for k, v in (tb or {}).items():
@@ -94,7 +100,7 @@ def train_one_epoch(model, optimizer, train_loader, model_func, lr_scheduler, ac
                     'Non-finite loss detected at iter %d (epoch %d). Skip this iteration. bad_tb_keys=%s',
                     accumulated_iter, cur_epoch + 1, bad_tb_keys
                 )
-            optimizer.zero_grad(set_to_none=True)
+            _safe_zero_grad(optimizer)
             accumulated_iter += 1
             end = time.time()
             continue
