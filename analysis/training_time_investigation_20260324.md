@@ -382,3 +382,13 @@ bash tools/scripts/dist_train.sh 4 \
 本地新增的修复分两层：
 - 在 `TransFusionHead.get_targets_single` 中，将用于匹配的预测张量强制到 fp32，并对解码后的 `pred_boxes` 做 `nan_to_num`；
 - 在 `HungarianAssigner3D.assign` 中再次对 `cost` 做 finite 兜底，确保匹配器输入合法。
+
+## 澄清：是否“为了配合 FP16 的改动”导致了这个问题？
+
+不是。更准确地说：
+
+- 触发条件是你启用了 `--use_amp`（混合精度路径），这会改变部分算子的数值范围与 dtype 组合；
+- 报错暴露的是原有训练/匹配链路在非有限值与 dtype 不一致上的鲁棒性不足；
+- 本次代码修改是“防护与稳定化”（dtype 对齐、finite 兜底、匹配分支转 fp32），不是引入问题的根因。
+
+因此，应理解为：AMP 放大并暴露了原有数值稳定性问题，补丁是在修复暴露出来的问题，而不是制造问题。
