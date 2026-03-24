@@ -392,3 +392,111 @@ bash tools/scripts/dist_train.sh 4 \
 - 本次代码修改是“防护与稳定化”（dtype 对齐、finite 兜底、匹配分支转 fp32），不是引入问题的根因。
 
 因此，应理解为：AMP 放大并暴露了原有数值稳定性问题，补丁是在修复暴露出来的问题，而不是制造问题。
+
+## 汇总：为开启 `--use_amp` 与修复 Hungarian 匹配所做改动及潜在影响
+
+### 1) 为开启 AMP 做的关键改动
+
+A. 在 3D 主干写回处做 dtype 对齐（LION / LocalMamba）
+- 目的：避免 `index_put` 时报 `Half/Float` 不一致错误。
+- 影响：
+  - 正向：消除训练中断，保证写回成功。
+  - 代价：在写回点存在一次显式 cast，带来极小额外开销；数值上等价于一次量化到目标 dtype。
+
+B. 在 TransFusion 匹配分支强制使用 fp32
+- 位置：`get_targets_single` 中用于 decode/matching 的 `heatmap/center/height/dim/rot/vel`。
+- 影响：
+  - 正向：降低 `exp/log/cdist` 在半精度下的溢出/下溢风险。
+  - 代价：该分支显存与算时略增（相较 half），但稳定性提升明显。
+
+### 2) 为修复 Hungarian 匹配做的关键改动
+
+A. 对代价矩阵做 finite 兜底（`torch.nan_to_num` + `np.nan_to_num`）
+- 目的：满足 `linear_sum_assignment` 对有限数值输入的要求，避免 `ValueError`。
+- 影响：
+  - 正向：训练不会因单次非有限值直接崩溃。
+  - 代价：当出现 NaN/Inf 时，匹配目标从“原始代价最优”变为“清洗后代价最优”。
+
+### 3) 数学层面的影响解释
+
+1. Hungarian 目标：
+   `min_{pi} sum_i C_{i,pi(i)}`。当 `C` 含 NaN/Inf 时优化问题在数值上不可直接求解；用大常数替换后，相当于给异常项施加极大惩罚。
+
+2. fp16 -> fp32 / fp32 -> fp16 转换影响：
+   - fp32 在 `exp/log` 等函数上的有效动态范围远大于 fp16；
+   - 在写回点 cast 到目标 dtype 会引入量化误差，但这是受控且局部的，优先级低于“训练中断”。
+
+3. 为何 `dim.exp()` 容易触发问题：
+   - 在 half 下，若输入过大，`exp` 可能溢出到 `Inf`，随后传播到 cost。
+
+### 4) 对你训练结果最可能的实际影响（仅就本次改动）
+
+- 稳定性：显著提升（不再因 dtype mismatch 或非法 cost 立即中断）。
+- 速度：轻微下降（匹配分支转 fp32 + 额外 finite 检查/cast）。
+- 精度：
+  - 在无 NaN/Inf 时，影响很小；
+  - 在出现 NaN/Inf 的 batch，匹配会按“清洗后代价”进行，可能引入少量标签分配偏差。
+
+### 5) 参考文献与文档（真实链接）
+
+- Mixed Precision Training（AMP 数值稳定性背景）: https://arxiv.org/abs/1710.03740
+- PyTorch AMP 文档: https://pytorch.org/docs/stable/notes/amp_examples.html
+- Hungarian method (Kuhn, 1955): https://www.jstor.org/stable/2307832
+- SciPy `linear_sum_assignment`: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linear_sum_assignment.html
+- Floating-point 经典参考（IEEE 浮点误差背景）: https://dl.acm.org/doi/10.1145/103162.103163
+
+## 关于终端提示：`NaN or Inf found in input tensor.`
+
+该提示不是上述“dtype 对齐/finite 兜底”代码直接打印的（仓库代码中无该固定字符串）。
+
+含义是：在更早的前向/反向链路里已经产生了非有限值；本次补丁只是避免在特定位置（索引写回、Hungarian 输入）直接崩溃。
+
+因此如果仍看到该提示，说明还存在上游数值不稳定，需要继续定位产生 NaN/Inf 的第一层模块。
+
+## 对“持续刷屏 NaN or Inf found in input tensor”是否正常的结论
+
+不正常。偶发 1-2 次可视为数值抖动，但连续高频出现通常意味着训练已进入不稳定区间（上游模块持续产生非有限值）。
+
+本地新增防护：在训练循环中若检测到 `loss` 非有限则跳过该 iter 并清梯度，避免把非有限梯度写入优化器状态。
+
+## 严谨关系分析：报错与“AMP改动/Hungarian改动”的因果关系
+
+### 结论分层
+
+1. **`Index put ... dtype mismatch`**
+- 与 AMP 直接相关：AMP 使部分张量为 half、部分仍为 float，触发索引写回 dtype 不一致。
+- 本地 dtype 对齐补丁与该报错是“直接因果对应”（补丁就是为修复该报错）。
+
+2. **`ValueError: matrix contains invalid numeric entries`（Hungarian）**
+- 直接触发条件：传入 `linear_sum_assignment` 的 `cost` 含 NaN/Inf。
+- AMP 会提高出现非有限值的概率（尤其在 `exp/log` 等操作处），但不是唯一必要条件。
+- Hungarian 相关补丁是“故障隔离层”：把非法输入变有限，防止求解器崩溃。
+
+3. **持续刷屏 `NaN or Inf found in input tensor`**
+- 说明上游仍持续产生非有限值；
+- 这与“防崩溃补丁”并不矛盾：补丁降低了崩溃概率，但不会自动消除所有上游数值源。
+
+### 数学链路
+
+- 训练更新：`theta_{t+1} = theta_t - eta * g_t`。若 `g_t` 非有限，则更新无定义或失真。
+- 匹配目标：`min_{pi} sum_i C_{i,pi(i)}`；当 `C` 含 NaN/Inf 时，数值求解器不可直接工作。
+- `nan_to_num` 的作用：把非法项替换为大罚项，从“不可解”转为“可解但带惩罚近似”的优化问题。
+
+### 代码层映射（对应关系）
+
+- AMP相关写回修复：LION/LocalMamba 写回前 dtype 对齐。
+- Hungarian相关修复：`cost` 在 torch 与 numpy 两侧 finite 兜底。
+- 上游稳定化：TransFusion 匹配分支转 fp32，并对 decoded boxes 清洗。
+
+这三类改动共同作用：
+- 第一类解决“类型不匹配崩溃”；
+- 第二类解决“匹配器输入非法崩溃”；
+- 第三类降低上游生成 NaN/Inf 的概率。
+
+### 文献与文档依据（真实链接）
+
+- Mixed Precision Training: https://arxiv.org/abs/1710.03740
+- PyTorch AMP docs: https://pytorch.org/docs/stable/notes/amp_examples.html
+- Hungarian method (Kuhn, 1955): https://www.jstor.org/stable/2307832
+- SciPy linear_sum_assignment: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linear_sum_assignment.html
+- Floating-point reference (Goldberg, 1991): https://dl.acm.org/doi/10.1145/103162.103163
