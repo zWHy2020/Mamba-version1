@@ -367,3 +367,18 @@ bash tools/scripts/dist_train.sh 4 \
 - 再调用 `linear_sum_assignment`。
 
 这能防止训练因非法数值直接中断，并保留匹配流程可执行。
+
+## 为何会出现非有限值（NaN/Inf）
+
+在当前检测头路径里，Hungarian 代价由三部分相加：
+
+`cost = cls_cost + reg_cost + iou_cost`
+
+对应实现中，非有限值常见来源有：
+1. `dim.exp()`（解码尺寸）在半精度下可能溢出为 `Inf`；
+2. 上游预测里若已有 NaN，会通过 `sigmoid/log/cdist` 继续传播；
+3. 一旦任一项出现 NaN/Inf，`cost` 就会包含非法值，SciPy 的 `linear_sum_assignment` 会抛出 `ValueError`。
+
+本地新增的修复分两层：
+- 在 `TransFusionHead.get_targets_single` 中，将用于匹配的预测张量强制到 fp32，并对解码后的 `pred_boxes` 做 `nan_to_num`；
+- 在 `HungarianAssigner3D.assign` 中再次对 `cost` 做 finite 兜底，确保匹配器输入合法。
