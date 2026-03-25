@@ -963,10 +963,7 @@ class LIONLayer(nn.Module):
 
                 x_features = block(x_features)
 
-                src_features = x_features.view(-1, x_features.shape[-1])[mappings["win2flat"]]
-                if src_features.dtype != x.features.dtype:
-                    src_features = src_features.to(dtype=x.features.dtype)
-                x.features[indices] = src_features
+                x.features[indices] = x_features.view(-1, x_features.shape[-1])[mappings["win2flat"]]
 
         return x
 
@@ -1031,10 +1028,7 @@ class LocalMambaLayer(nn.Module):
 
                 if self.use_inverse:
                     x_features = torch.flip(x_features, dims=[1])
-                src_features = x_features.view(-1, x_features.shape[-1])[mappings["win2flat"]]
-                if src_features.dtype != x.features.dtype:
-                    src_features = src_features.to(dtype=x.features.dtype)
-                x.features[indices] = src_features
+                x.features[indices] = x_features.view(-1, x_features.shape[-1])[mappings["win2flat"]]
 
         return x, mappings
 
